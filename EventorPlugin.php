@@ -60,7 +60,10 @@ echo "from eventor<br/>";
         $url = $activity['url'];
         $numRegistrations = $activity['registrationCount'];
         $registrationDeadline = $activity['registrationDeadline'];
+        
 		$name = htmlentities($name);//, ENT_QUOTES, 'UTF-8');
+		$date = new DateTime($registrationDeadline);
+		$registrationDeadline = $date->format('j/n H:i');
 		
         $data .= "<a href=\"" . $url . "\">" . $name . "<a/> (" . $numRegistrations . ") - " . $registrationDeadline . "<br/>";
       }
