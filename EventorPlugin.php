@@ -41,13 +41,13 @@
 
   function getActivities() {
     $data = "";
-
+	$fromDate=date("Y-m-d");
     $cache .= CACHE . "activity.cache";
 
     if (!file_exists($cache) || (file_exists($cache) && filemtime($cache) < (time() - EVENTOR_ACTIVITY_CACHE_TTL))) {
 echo "from eventor<br/>";
 
-      $url = EVENTOR_API_BASE_URL . "activities?organisationId=" . EVENTOR_ORGANISATION_ID . "&from=2011-01-01&to=2011-12-31&includeRegistrations=false";
+      $url = EVENTOR_API_BASE_URL . "activities?organisationId=" . EVENTOR_ORGANISATION_ID . "&from=" . $fromDate . "&to=2011-12-31&includeRegistrations=false";
       $xml = eventorApiCall($url);
 
       $activities = array();
@@ -60,7 +60,8 @@ echo "from eventor<br/>";
         $url = $activity['url'];
         $numRegistrations = $activity['registrationCount'];
         $registrationDeadline = $activity['registrationDeadline'];
-
+		$name = htmlentities($name);//, ENT_QUOTES, 'UTF-8');
+		
         $data .= "<a href=\"" . $url . "\">" . $name . "<a/> (" . $numRegistrations . ") - " . $registrationDeadline . "<br/>";
       }
 
