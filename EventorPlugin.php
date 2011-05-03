@@ -11,7 +11,7 @@
   define('EVENTOR_API_KEY', "8ebc1e96796547518d68a8b37059e95e");
   define('EVENTOR_API_BASE_URL', "https://eventor.orientering.no/api/");
   define('EVENTOR_ORGANISATION_ID', 245); //
-  define('EVENTOR_ACTIVITY_CACHE_TTL', 60*5);
+  define('EVENTOR_ACTIVITY_CACHE_TTL', 60*1);
 
   # Caching
   define(CACHE, dirname(__FILE__) . '/cache/');
@@ -53,25 +53,27 @@ echo "from eventor<br/>";
       $activities = array();
 
       $doc = simplexml_load_string($xml);
-      $activityNodes = $doc->xpath("//Activity");
+      $activityNodes = $doc->Activity;
 
-      foreach ($activityNodes as $activityNode) {
-        $name = $activityNode->xpath("Name");
-        $url = $activityNode->xpath("@url");
-        $registrationDeadline = $activityNode->xpath("@registrationDeadline");
+      foreach ($doc->Activity as $activity) {
+        $name = $activity->Name;
+        $url = $activity['url'];
+        $numRegistrations = $activity['registrationCount'];
+        $registrationDeadline = $activity['registrationDeadline'];
 
-        $data .= "<a href=\"" . $url[0] . "\">" . $name[0] . "<a/> (" . $registrationDeadline[0] . ")<br/>";
+        $data .= "<a href=\"" . $url . "\">" . $name . "<a/> (" . $numRegistrations . ") - " . $registrationDeadline . "<br/>";
       }
 
       $cachefile = fopen($cache, 'wb');
       fwrite($cachefile, $data);
       fclose($cachefile);
     } else {
-echo "from cache (ttl: " . EVENTOR_ACTIVITY_CACHE_TTL . ")<br/>";
+echo "from cache (ttl: " . EVENTOR_ACTIVITY_CACHE_TTL . ", oldness " . (time()-filemtime($cache)) . ")<br/>";
       $data = file_get_contents($cache);
     }
 
     print $data;
   }
 
+  getActivities();
 ?>
