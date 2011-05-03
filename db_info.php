@@ -84,7 +84,7 @@ function hent_nsk_paameldingsfrister() {
 		$date = new DateTime($registrationDeadline);
 		$registrationDeadline = $date->format('d.m');
 
-		$data .= "<li><a href=\"" . $url . "\">" . $name . "<a/> (" . $registrationDeadline . ")</li>";
+		$data .= "<li><a href=\"" . $url . "\">" . $name . "<a/> - " . $numRegistrations . " (" . $registrationDeadline . ")</li>";
       }
 
       $cachefile = fopen($cache, 'wb');
