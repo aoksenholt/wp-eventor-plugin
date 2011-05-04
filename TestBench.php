@@ -2,6 +2,8 @@
 <form>
 
 <?php
+ // usage: http://url/wp-content/plugins/EventorPlugin/TestBench.php
+
 
 // Stub out the add_action function since EventorPlugin.php hook up top Wordpress with it.
 function add_action($a1, $a2){}
