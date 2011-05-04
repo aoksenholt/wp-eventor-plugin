@@ -8,6 +8,9 @@
  Author URI: http://nydalen.idrett.no
  */
 
+ 
+  // Check out Eventor API documentation on https://eventor.orientering.se/api/documentation
+  
   define('EVENTOR_API_KEY', "8ebc1e96796547518d68a8b37059e95e");
   define('EVENTOR_API_BASE_URL', "https://eventor.orientering.no/api/");
   define('EVENTOR_ORGANISATION_ID', 245); //
@@ -16,16 +19,15 @@
   # Caching
   define(CACHE, dirname(__FILE__) . '/cache/');
 
-
   add_action('widgets_init', 'add_widget');
   		
 
   function add_widget()
-{
-  
-    require_once 'EventorWidget.php';
-	register_widget('Eventor_Widget_ClubDeadlines');
-}  
+	{
+	  
+		require_once 'EventorWidget.php';
+		register_widget('Eventor_Widget_ClubDeadlines');
+	}  
    
   function eventorApiCall($url)
   {
@@ -37,7 +39,6 @@
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 	
-
     // set header
     curl_setopt($ch, CURLOPT_HTTPHEADER, array("ApiKey: " . EVENTOR_API_KEY));
 	
@@ -55,25 +56,23 @@
     return $output;
   }
 
-  
-  
-  function getActivities() {
-    $data = "";
-	$fromDate=date("Y-m-d");
-    $cache .= CACHE . "activity.cache";
-
-    if (!file_exists($cache) || (file_exists($cache) && filemtime($cache) < (time() - EVENTOR_ACTIVITY_CACHE_TTL))) {
-//echo "from eventor<br/>";
-
+  function getActivitiesFromEventor()
+  {
+	  $fromDate=date("Y-m-d");
       $url = EVENTOR_API_BASE_URL . "activities?organisationId=" . EVENTOR_ORGANISATION_ID . "&from=" . $fromDate . "&to=2011-12-31&includeRegistrations=false";
-      $xml = eventorApiCall($url);
-
-	  //echo $xml;
+      $xml = eventorApiCall($url);	 
 	  
-      $activities = array();
+	  return $xml;
+  }
+  
+  function makeActivitiesHtml($xml)
+  {
+	 $activities = array();
 
       $doc = simplexml_load_string($xml);
       $activityNodes = $doc->Activity;	 
+	  
+	  $data = '<ul>';
 	  
       foreach ($doc->Activity as $activity) {
         $name = $activity->Name;
@@ -85,8 +84,28 @@
 		$date = new DateTime($registrationDeadline);
 		$registrationDeadline = $date->format('j/n H:i');
 		
-        $data .= "<a href=\"" . $url . "\">" . $name . "</a> (" . $numRegistrations . ") - " . $registrationDeadline . "<br/>";
+        $data .= "<li><a href=\"" . $url . "\">" . $name . "</a> (" . $numRegistrations . ") - " . $registrationDeadline . "</li>";		
       }
+	  
+	  $data .= '</ul>';
+	  
+	  return $data;
+  }
+  
+  
+  function getActivities() {
+    $data = "";
+	
+    $cache .= CACHE . "activity.cache";
+
+    if (!file_exists($cache) || (file_exists($cache) && filemtime($cache) < (time() - EVENTOR_ACTIVITY_CACHE_TTL))) {
+//echo "from eventor<br/>";
+
+	   $xml = getActivitiesFromEventor();
+	  
+	  //echo $xml;
+	  
+      $data = makeActivitiesHtml($xml);
 
       $cachefile = fopen($cache, 'wb');
       fwrite($cachefile, $data);
