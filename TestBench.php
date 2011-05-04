@@ -48,8 +48,9 @@ function doTest()
 	$xml = $xmlFunc();
 	$html = $htmlFunc($xml);
 
-	echo "<textarea rows=30 cols=150>$xml</textarea>";	
-	echo "<textarea rows=30 cols=150>$html</textarea>";
+	echo "XML<br /><textarea rows=30 cols=150>$xml</textarea>";	
+	echo "<br />HTML<br /><textarea rows=10 cols=150>$html</textarea>";
+	echo "<hr />Preview <br />$html";
 }
 
 printActionControls();
