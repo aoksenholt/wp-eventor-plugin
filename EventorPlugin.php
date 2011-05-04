@@ -21,10 +21,8 @@
 
   add_action('widgets_init', 'add_widget');
   		
-
   function add_widget()
 	{
-	  
 		require_once 'EventorWidget.php';
 		register_widget('Eventor_Widget_ClubDeadlines');
 	}  
@@ -37,7 +35,7 @@
     curl_setopt($ch, CURLOPT_URL, $url);
     // return the transfer as a string
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 	
     // set header
     curl_setopt($ch, CURLOPT_HTTPHEADER, array("ApiKey: " . EVENTOR_API_KEY));
@@ -45,13 +43,11 @@
     // $output contains the output string
     $output = curl_exec($ch);
 
-	if (!$output)
-		echo curl_error($ch);
+		if (!$output)
+			echo curl_error($ch);
 	
     // close curl resource to free up system resources
     curl_close($ch);
-
-//echo $url;
 
     return $output;
   }
@@ -67,10 +63,10 @@
   
   function makeActivitiesHtml($xml)
   {
-	 $activities = array();
+		$activities = array();
 
-      $doc = simplexml_load_string($xml);
-      $activityNodes = $doc->Activity;	 
+    $doc = simplexml_load_string($xml);
+    $activityNodes = $doc->Activity;	 
 	  
 	  $data = '<ul>';
 	  
@@ -80,9 +76,9 @@
         $numRegistrations = $activity['registrationCount'];
         $registrationDeadline = $activity['registrationDeadline'];
         
-		$name = htmlentities($name);//, ENT_QUOTES, 'UTF-8');
-		$date = new DateTime($registrationDeadline);
-		$registrationDeadline = $date->format('j/n H:i');
+				$name = htmlentities($name);//, ENT_QUOTES, 'UTF-8');
+				$date = new DateTime($registrationDeadline);
+				$registrationDeadline = $date->format('j/n H:i');
 		
         $data .= "<li><a href=\"" . $url . "\">" . $name . "</a> (" . $numRegistrations . ") - " . $registrationDeadline . "</li>";		
       }
@@ -100,8 +96,8 @@
 
     if (!file_exists($cache) || (file_exists($cache) && filemtime($cache) < (time() - EVENTOR_ACTIVITY_CACHE_TTL))) {
 //echo "from eventor<br/>";
-
-	   $xml = getActivitiesFromEventor();
+		
+	  $xml = getActivitiesFromEventor();
 	  
 	  //echo $xml;
 	  
