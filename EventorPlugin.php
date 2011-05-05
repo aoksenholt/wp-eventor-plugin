@@ -11,10 +11,11 @@
 
 // Check out Eventor API documentation on https://eventor.orientering.se/api/documentation
 
-define('EVENTOR_API_KEY', "8ebc1e96796547518d68a8b37059e95e");
-define('EVENTOR_API_BASE_URL', "https://eventor.orientering.no/api/");
-define('EVENTOR_ORGANISATION_ID', 245); //
-define('EVENTOR_ACTIVITY_CACHE_TTL', 60*1);
+//define('EVENTOR_ACTIVITY_CACHE_TTL', 60*1);
+define('MT_EVENTOR_BASEURL', 'mt_eventor_baseurl');
+define('MT_EVENTOR_APIKEY', 'mt_eventor_apikey');
+define('MT_EVENTOR_ORGID', 'mt_eventor_orgid');
+define('MT_EVENTOR_ACTIVITY_TTL', 'mt_eventor_activity_ttl');
 
 # Caching
 define(CACHE, dirname(__FILE__) . '/cache/');
@@ -40,27 +41,28 @@ function eventor_add_pages() {
 // donate_options_page() displays the page content for the Test Options submenu
 function eventor_options_page() {
 
-	// variables for the field and option names
-	$opt_baseurl = 'mt_eventor_baseurl';
-	$opt_apikey = 'mt_eventor_apikey';
 	$hidden_field_name = 'mt_eventor_submit_hidden';
-	$data_field_baseurl = 'mt_eventor_baseurl';
-	$data_field_apikey = 'mt_evenor_apikey';
 
 	// Read in existing option value from database
-	$opt_baseurl_val = get_option( $opt_baseurl );
-	$opt_apikey_val = get_option( $opt_apikey );
+	$opt_baseurl_val = get_option( MT_EVENTOR_BASEURL );
+	$opt_apikey_val = get_option( MT_EVENTOR_APIKEY );
+	$opt_orgid_val = get_option( MT_EVENTOR_ORGID );
+	$opt_act_ttl_val = get_option( MT_EVENTOR_ACTIVITY_TTL );
 
 	// See if the user has posted us some information
 	// If they did, this hidden field will be set to 'Y'
 	if( $_POST[ $hidden_field_name ] == 'Y' ) {
 		// Read their posted value
-		$opt_baseurl_val = $_POST[ $data_field_baseurl ];
-		$opt_apikey_val = $_POST[ $data_field_apikey ];
+		$opt_baseurl_val = $_POST[ MT_EVENTOR_BASEURL ];
+		$opt_apikey_val = $_POST[ MT_EVENTOR_APIKEY ];
+		$opt_orgid_val = $_POST[ MT_EVENTOR_ORGID ];
+		$opt_act_ttl_val = $_POST[ MT_EVENTOR_ACTIVITY_TTL ];
 
 		// Save the posted value in the database
-		update_option( $opt_baseurl, $opt_baseurl_val );
-		update_option( $opt_apikey, $opt_apikey_val );
+		update_option( MT_EVENTOR_BASEURL, $opt_baseurl_val );
+		update_option( MT_EVENTOR_APIKEY, $opt_apikey_val );
+		update_option( MT_EVENTOR_ORGID, $opt_orgid_val);
+		update_option( MT_EVENTOR_ACTIVITY_TTL, $opt_act_ttl_val );
 
 		// Put an options updated message on the screen
 
@@ -85,13 +87,23 @@ function eventor_options_page() {
 	name="<?php echo $hidden_field_name; ?>" value="Y">
 
 <p><?php _e("Base URL:", 'mt_trans_domain' ); ?> <input type="text"
-	name="<?php echo $data_field_baseurl; ?>"
+	name="<?php echo MT_EVENTOR_BASEURL; ?>"
 	value="<?php echo $opt_baseurl_val; ?>" size="50"></p>
 <hr />
 
 <p><?php _e("API Key:", 'mt_trans_domain' ); ?> <input type="text"
-	name="<?php echo $data_field_apikey; ?>"
+	name="<?php echo MT_EVENTOR_APIKEY; ?>"
 	value="<?php echo $opt_apikey_val; ?>" size="50"></p>
+<hr />
+
+<p><?php _e("Organisation ID:", 'mt_trans_domain' ); ?> <input
+	type="text" name="<?php echo MT_EVENTOR_ORGID; ?>"
+	value="<?php echo $opt_orgid_val; ?>" size="50"></p>
+<hr />
+
+<p><?php _e("Club activities TTL:", 'mt_trans_domain' ); ?> <input
+	type="text" name="<?php echo MT_EVENTOR_ACTIVITY_TTL; ?>"
+	value="<?php echo $opt_act_ttl_val; ?>" size="50"></p>
 <hr />
 
 <p class="submit"><input type="submit" name="Submit"
@@ -126,7 +138,7 @@ function eventorApiCall($url)
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
 	// set header
-	curl_setopt($ch, CURLOPT_HTTPHEADER, array("ApiKey: " . EVENTOR_API_KEY));
+	curl_setopt($ch, CURLOPT_HTTPHEADER, array("ApiKey: " . get_option(MT_EVENTOR_APIKEY)));
 
 	// $output contains the output string
 	$output = curl_exec($ch);
@@ -143,7 +155,7 @@ function eventorApiCall($url)
 function getActivitiesFromEventor()
 {
 	$fromDate=date("Y-m-d");
-	$url = EVENTOR_API_BASE_URL . "activities?organisationId=" . EVENTOR_ORGANISATION_ID . "&from=" . $fromDate . "&to=2011-12-31&includeRegistrations=false";
+	$url = get_option(MT_EVENTOR_BASEURL) . "activities?organisationId=" . get_option(MT_EVENTOR_ORGID) . "&from=" . $fromDate . "&to=2011-12-31&includeRegistrations=false";
 	$xml = eventorApiCall($url);
 
 	return $xml;
@@ -164,7 +176,7 @@ function makeActivitiesHtml($xml)
 		$numRegistrations = $activity['registrationCount'];
 		$registrationDeadline = $activity['registrationDeadline'];
 
-		$name = htmlentities($name);//, ENT_QUOTES, 'UTF-8');
+		$name = htmlentities($name);
 		$date = new DateTime($registrationDeadline);
 		$registrationDeadline = $date->format('j/n H:i');
 
@@ -182,12 +194,10 @@ function getActivities() {
 
 	$cache .= CACHE . "activity.cache";
 
-	if (!file_exists($cache) || (file_exists($cache) && filemtime($cache) < (time() - EVENTOR_ACTIVITY_CACHE_TTL))) {
+	if (!file_exists($cache) || (file_exists($cache) && filemtime($cache) < (time() - get_option(MT_EVENTOR_ACTIVITY_TTL)))) {
 		//echo "from eventor<br/>";
 
 		$xml = getActivitiesFromEventor();
-			
-		//echo $xml;
 			
 		$data = makeActivitiesHtml($xml);
 
@@ -195,12 +205,10 @@ function getActivities() {
 		fwrite($cachefile, $data);
 		fclose($cachefile);
 	} else {
-		//echo "from cache (ttl: " . EVENTOR_ACTIVITY_CACHE_TTL . ", oldness " . (time()-filemtime($cache)) . ")<br/>";
+		//echo "from cache (ttl: " . get_option(MT_EVENTOR_ACTIVITY_TTL) . ", oldness " . (time()-filemtime($cache)) . ")<br/>";
 		$data = file_get_contents($cache);
 	}
 
 	print $data;
 }
-
-//getActivities();
 ?>
