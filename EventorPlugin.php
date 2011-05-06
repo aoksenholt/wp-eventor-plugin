@@ -11,11 +11,10 @@
 
 // Check out Eventor API documentation on https://eventor.orientering.se/api/documentation
 
-//define('EVENTOR_ACTIVITY_CACHE_TTL', 60*1);
-define('MT_EVENTOR_BASEURL', 'mt_eventor_baseurl');
-define('MT_EVENTOR_APIKEY', 'mt_eventor_apikey');
-define('MT_EVENTOR_ORGID', 'mt_eventor_orgid');
-define('MT_EVENTOR_ACTIVITY_TTL', 'mt_eventor_activity_ttl');
+define(MT_EVENTOR_BASEURL, 'mt_eventor_baseurl');
+define(MT_EVENTOR_APIKEY, 'mt_eventor_apikey');
+define(MT_EVENTOR_ORGID, 'mt_eventor_orgid');
+define(MT_EVENTOR_ACTIVITY_TTL, 'mt_eventor_activity_ttl');
 
 # Caching
 define(CACHE, dirname(__FILE__) . '/cache/');
@@ -114,19 +113,6 @@ function eventor_options_page() {
 	<?php
 }
 
-function show_eventor($args) {
-
-	extract($args);
-
-	echo $before_widget.$before_title.$option_header.$after_title;
-
-	echo $after_widget;
-}
-
-function init_eventor_widget() {
-	register_sidebar_widget("Eventor Widget", "show_eventor");
-}
-
 function eventorApiCall($url)
 {
 	// create curl resource
@@ -154,8 +140,10 @@ function eventorApiCall($url)
 
 function getActivitiesFromEventor()
 {
-	$fromDate=date("Y-m-d");
-	$url = get_option(MT_EVENTOR_BASEURL) . "activities?organisationId=" . get_option(MT_EVENTOR_ORGID) . "&from=" . $fromDate . "&to=2011-12-31&includeRegistrations=false";
+	$fromDate = date("Y-m-d");
+	$toDate = date("Y-m-d", strtotime("+1 year", strtotime($fromDate)));
+		
+	$url = get_option(MT_EVENTOR_BASEURL) . "activities?organisationId=" . get_option(MT_EVENTOR_ORGID) . "&from=" . $fromDate . "&to=" . $toDate . "&includeRegistrations=false";
 	$xml = eventorApiCall($url);
 
 	return $xml;
