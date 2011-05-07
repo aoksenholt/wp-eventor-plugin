@@ -60,6 +60,11 @@ abstract class Query
 	
 	private function initCache($cacheKey)
 	{
+		if (!is_dir(CACHE))
+		{
+			mkdir(CACHE);
+		}
+			
 		$cacheKey = get_class($this).$cacheKey;
 		$this->cacheFile = CACHE . $cacheKey . ".cache";
 	}
