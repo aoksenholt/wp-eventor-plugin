@@ -80,7 +80,7 @@ class EventorQueryWidget extends WP_Widget {
 		}
 		?>
 	<option value="<?php echo $availableQuery; ?>"
-	<?php if ($selected) echo "selected=\yes\""; ?>><?php echo $availableQuery; ?></option>
+	<?php if ($selected) echo " selected=\"yes\""; ?>><?php echo $availableQuery; ?></option>
 	<?php
 	}
 	?>
