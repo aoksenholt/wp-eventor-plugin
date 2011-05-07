@@ -15,7 +15,7 @@ function get_option($option)
 		case MT_EVENTOR_APIKEY:
 			return "8ebc1e96796547518d68a8b37059e95e";
 		case MT_EVENTOR_BASEURL:
-			return "https://eventor.orientering.no/api/";
+			return "https://eventor.orientering.no";
 		case MT_EVENTOR_ORGID:
 			return 245;
 		case MT_EVENTOR_ACTIVITY_TTL:

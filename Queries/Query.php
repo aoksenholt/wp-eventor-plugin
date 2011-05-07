@@ -101,6 +101,7 @@ abstract class Query
 	{
 		$url = get_option(MT_EVENTOR_BASEURL). '/api/' . $url;
 		
+		echo $url;
 		// create curl resource
 		$ch = curl_init();
 		// set url
