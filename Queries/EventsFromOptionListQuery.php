@@ -24,7 +24,7 @@ class EventsFromOptionListQuery extends Query
 		foreach ($doc->Event as $event)
 		{
 			$eventId = $event->EventId;
-			$name = $event->Name;
+			$name = utf8_decode($event->Name);
 
 			$eventorUrl = get_option(MT_EVENTOR_BASEURL) . '/Events/Show/'.$eventId;
 
