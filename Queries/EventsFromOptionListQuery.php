@@ -25,7 +25,7 @@ class EventsFromOptionListQuery extends Query
 		{
 			$eventId = $event->EventId;
 			$name = $event->Name;
-				
+
 			$eventorUrl = get_option(MT_EVENTOR_BASEURL) . '/Events/Show/'.$eventId;
 
 			$eventDate = $event->StartDate->Date;

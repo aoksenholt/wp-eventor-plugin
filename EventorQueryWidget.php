@@ -6,9 +6,7 @@ class EventorQueryWidget extends WP_Widget {
 	private $availableQueries;
 
 	function EventorQueryWidget() {
-		parent::WP_Widget(false, 'Eventor Query');
-
-		$this->initAvailableQueries();
+		parent::WP_Widget(false, 'Eventor Query');		
 	}
 
 	function initAvailableQueries()
@@ -58,6 +56,8 @@ class EventorQueryWidget extends WP_Widget {
 	// Lay out the widget config form
 	function form($instance)
 	{
+		$this->initAvailableQueries();
+		
 		$title = esc_attr($instance['title']);
 		$query =  esc_attr($instance['query']);
 		?>
