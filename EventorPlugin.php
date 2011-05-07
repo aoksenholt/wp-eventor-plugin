@@ -102,17 +102,14 @@ function eventor_options_page()
 <p><?php _e("Base URL:", 'mt_trans_domain' ); ?> <input type="text"
 	name="<?php echo MT_EVENTOR_BASEURL; ?>"
 	value="<?php echo $opt_baseurl_val; ?>" size="50"></p>
-<hr />
 
 <p><?php _e("API Key:", 'mt_trans_domain' ); ?> <input type="text"
 	name="<?php echo MT_EVENTOR_APIKEY; ?>"
 	value="<?php echo $opt_apikey_val; ?>" size="50"></p>
-<hr />
 
 <p><?php _e("Organisation ID:", 'mt_trans_domain' ); ?> <input
 	type="text" name="<?php echo MT_EVENTOR_ORGID; ?>"
 	value="<?php echo $opt_orgid_val; ?>" size="50"></p>
-<hr />
 
 <p><?php _e("Club activities TTL:", 'mt_trans_domain' ); ?> <input
 	type="text" name="<?php echo MT_EVENTOR_ACTIVITY_TTL; ?>"
