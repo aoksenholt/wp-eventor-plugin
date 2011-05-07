@@ -40,7 +40,7 @@ function endsWith( $str, $sub )
 function __autoload($class_name)
 {
 	if (endsWith($class_name, 'Query'))
-	include 'Queries\\' .$class_name . '.php';
+	include 'Queries/' .$class_name . '.php';
 }
 
 // action function for above hook
