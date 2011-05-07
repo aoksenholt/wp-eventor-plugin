@@ -8,16 +8,15 @@
  Author URI: http://nydalen.idrett.no
  */
 
-
 // Check out Eventor API documentation on https://eventor.orientering.se/api/documentation
 
-define(MT_EVENTOR_BASEURL, 'mt_eventor_baseurl');
-define(MT_EVENTOR_APIKEY, 'mt_eventor_apikey');
-define(MT_EVENTOR_ORGID, 'mt_eventor_orgid');
-define(MT_EVENTOR_ACTIVITY_TTL, 'mt_eventor_activity_ttl');
+define('MT_EVENTOR_BASEURL', 'mt_eventor_baseurl');
+define('MT_EVENTOR_APIKEY', 'mt_eventor_apikey');
+define('MT_EVENTOR_ORGID', 'mt_eventor_orgid');
+define('MT_EVENTOR_ACTIVITY_TTL', 'mt_eventor_activity_ttl');
 
 # Caching
-define(CACHE, dirname(__FILE__) . '/cache/');
+define('CACHE', dirname(__FILE__) . '/cache/');
 
 add_action('widgets_init', 'add_widget');
 
@@ -26,17 +25,30 @@ add_action('admin_menu', 'eventor_add_pages');
 
 function add_widget()
 {
-	require_once 'EventorWidget.php';
-	register_widget('Eventor_Widget_ClubDeadlines');
+	require_once 'EventorQueryWidget.php';
+	register_widget('EventorQueryWidget');
 }
 
+function endsWith( $str, $sub ) 
+{
+	return ( substr( $str, strlen( $str ) - strlen( $sub ) ) == $sub );
+}
+
+// Automatic include of Query classes
+function __autoload($class_name) 
+{
+	if (endsWith($class_name, 'Query'))
+    	include 'Queries\\' .$class_name . '.php';
+}
 
 // action function for above hook
-function eventor_add_pages() {
+function eventor_add_pages() 
+{
 	add_options_page('Eventor', 'Eventor', 'administrator', 'eventor', 'eventor_options_page');
 }
-// donate_options_page() displays the page content for the Test Options submenu
-function eventor_options_page() {
+
+function eventor_options_page() 
+{
 
 	$hidden_field_name = 'mt_eventor_submit_hidden';
 
@@ -109,92 +121,5 @@ function eventor_options_page() {
 
 </form>
 	<?php
-}
-
-function eventorApiCall($url)
-{
-	// create curl resource
-	$ch = curl_init();
-	// set url
-	curl_setopt($ch, CURLOPT_URL, $url);
-	// return the transfer as a string
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-
-	// set header
-	curl_setopt($ch, CURLOPT_HTTPHEADER, array("ApiKey: " . get_option(MT_EVENTOR_APIKEY)));
-
-	// $output contains the output string
-	$output = curl_exec($ch);
-
-	if (!$output)
-	echo curl_error($ch);
-
-	// close curl resource to free up system resources
-	curl_close($ch);
-
-	return $output;
-}
-
-function getActivitiesFromEventor()
-{
-	$fromDate = date("Y-m-d");
-	$toDate = date("Y-m-d", strtotime("+1 year", strtotime($fromDate)));
-		
-	$url = get_option(MT_EVENTOR_BASEURL) . "activities?organisationId=" . get_option(MT_EVENTOR_ORGID) . "&from=" . $fromDate . "&to=" . $toDate . "&includeRegistrations=false";
-	$xml = eventorApiCall($url);
-
-	return $xml;
-}
-
-function makeActivitiesHtml($xml)
-{
-	$activities = array();
-
-	$doc = simplexml_load_string($xml);
-	$activityNodes = $doc->Activity;
-
-	$data = '<ul>';
-
-	foreach ($doc->Activity as $activity) {
-		$name = $activity->Name;
-		$url = $activity['url'];
-		$numRegistrations = $activity['registrationCount'];
-		$registrationDeadline = $activity['registrationDeadline'];
-
-		$name = htmlentities($name);
-		$date = new DateTime($registrationDeadline);
-		$registrationDeadline = $date->format('j/n H:i');
-
-		$data .= "<li><a href=\"" . $url . "\">" . $name . "</a> (" . $numRegistrations . ") - " . $registrationDeadline . "</li>";
-	}
-
-	$data .= '</ul>';
-
-	return $data;
-}
-
-
-function getActivities() {
-	$data = "";
-
-	$cache .= CACHE . "activity.cache";
-
-	if (!file_exists($cache) || (file_exists($cache) && filemtime($cache) < (time() - get_option(MT_EVENTOR_ACTIVITY_TTL)))) {
-		//echo "from eventor<br/>";
-
-		$xml = getActivitiesFromEventor();
-			
-		$data = makeActivitiesHtml($xml);
-
-		$cachefile = fopen($cache, 'wb');
-		fwrite($cachefile, $data);
-		fclose($cachefile);
-	} else {
-		//echo "from cache (ttl: " . get_option(MT_EVENTOR_ACTIVITY_TTL) . ", oldness " . (time()-filemtime($cache)) . ")<br/>";
-		$data = file_get_contents($cache);
-	}
-
-	print $data;
 }
 ?>
