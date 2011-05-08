@@ -15,6 +15,7 @@ define('MT_EVENTOR_APIKEY', 'mt_eventor_apikey');
 define('MT_EVENTOR_ORGID', 'mt_eventor_orgid');
 define('MT_EVENTOR_ACTIVITY_TTL', 'mt_eventor_activity_ttl');
 define('MT_EVENTOR_EVENTIDS', 'mt_eventor_eventids');
+define('MT_EVENTOR_CUSTOM_QUERY_PLUGIN', 'mt_eventor_custom_query_plugin');
 
 
 # Caching
@@ -39,8 +40,22 @@ function endsWith( $str, $sub )
 // Automatic include of Query classes
 function __autoload($class_name)
 {
-	if (endsWith($class_name, 'Query'))
-	include 'Queries/' .$class_name . '.php';
+	$includeBase = 'Queries/';
+
+	if (!endsWith($class_name, 'Query'))
+	{
+		return;
+	}
+
+	// Dynamically including 'extra' queries from a side-by-side plugin. 
+	// Plugin name from config setting.
+	// Convention: Extra queries starts with 'Custom'
+	if (substr($class_name, 0, 6) == 'Custom')
+	{
+		$includeBase = dirname(__FILE__). '/../'.get_option( MT_EVENTOR_CUSTOM_QUERY_PLUGIN ).'/';
+	}
+
+	include  $includeBase.$class_name . '.php';
 }
 
 // action function for above hook
@@ -59,6 +74,7 @@ function eventor_options_page()
 	$opt_orgid_val = get_option( MT_EVENTOR_ORGID );
 	$opt_act_ttl_val = get_option( MT_EVENTOR_ACTIVITY_TTL );
 	$opt_eventids_val = get_option( MT_EVENTOR_EVENTIDS );
+	$opt_custom_query_plugin_val = get_option( MT_EVENTOR_CUSTOM_QUERY_PLUGIN );
 
 	// See if the user has posted us some information
 	// If they did, this hidden field will be set to 'Y'
@@ -69,6 +85,7 @@ function eventor_options_page()
 		$opt_orgid_val = $_POST[ MT_EVENTOR_ORGID ];
 		$opt_act_ttl_val = $_POST[ MT_EVENTOR_ACTIVITY_TTL ];
 		$opt_eventids_val = $_POST[ MT_EVENTOR_EVENTIDS ];
+		$opt_custom_query_plugin_val = $_POST[ MT_EVENTOR_CUSTOM_QUERY_PLUGIN ];
 
 		// Save the posted value in the database
 		update_option( MT_EVENTOR_BASEURL, $opt_baseurl_val );
@@ -76,6 +93,7 @@ function eventor_options_page()
 		update_option( MT_EVENTOR_ORGID, $opt_orgid_val);
 		update_option( MT_EVENTOR_ACTIVITY_TTL, $opt_act_ttl_val );
 		update_option( MT_EVENTOR_EVENTIDS, $opt_eventids_val );
+		update_option( MT_EVENTOR_CUSTOM_QUERY_PLUGIN, $opt_custom_query_plugin_val);
 
 		// Put an options updated message on the screen
 
@@ -119,6 +137,11 @@ function eventor_options_page()
 <p><?php _e("Widget List EventIds:", 'mt_trans_domain' ); ?> <input
 	type="text" name="<?php echo MT_EVENTOR_EVENTIDS; ?>"
 	value="<?php echo $opt_eventids_val; ?>" size="50"></p>
+<hr />
+
+<p><?php _e("Custom Query Plugin Name:", 'mt_trans_domain' ); ?> <input
+	type="text" name="<?php echo MT_EVENTOR_CUSTOM_QUERY_PLUGIN; ?>"
+	value="<?php echo $opt_custom_query_plugin_val; ?>" size="50"></p>
 <hr />
 
 <p class="submit"><input type="submit" name="Submit"

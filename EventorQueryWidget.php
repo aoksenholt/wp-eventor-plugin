@@ -31,6 +31,15 @@ class EventorQueryWidget extends WP_Widget {
 	{
 		$availabledQueries = glob("" . dirname(__FILE__) . self::QUERIES_DIR . "*Query.php");
 
+		$this->includeAllQueryFiles($availabledQueries);
+		
+		// Include extra queries
+		$extraQueries = glob("" . dirname(__FILE__). '/../'.get_option( MT_EVENTOR_CUSTOM_QUERY_PLUGIN ).'/' . "*Query.php");		
+		$this->includeAllQueryFiles($extraQueries);
+	}
+
+	function includeAllQueryFiles($availabledQueries)
+	{
 		foreach ($availabledQueries as $availableQuery)
 		{
 			$tmp = substr($availableQuery, $this->last_index_of('/', $availableQuery));
@@ -41,8 +50,9 @@ class EventorQueryWidget extends WP_Widget {
 				include ($availableQuery);
 			}
 		}
+		
 	}
-
+	
 	function last_index_of($sub_str,$instr)
 	{
 		if(strstr($instr,$sub_str)!="")
