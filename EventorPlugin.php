@@ -43,11 +43,30 @@ function __autoload($class_name)
 	include 'Queries/' .$class_name . '.php';
 }
 
-// action function for above hook
+/**
+ * get current users role
+ */
+function get_user_role() {
+	global $current_user;
+
+	$user_roles = $current_user->roles;
+	$user_role = array_shift($user_roles);
+
+	return $user_role;
+}
+
+/* 
+ * action function for menu hook
+ */
 function eventor_add_pages()
 {
-	add_options_page('Eventor', 'Eventor', 'administrator', 'eventor', 'eventor_options_page');
-	add_management_page('Eventor deadlines', 'Eventor deadlines', 'paamelder', 'eventor', 'eventor_management_page');
+	add_options_page('Eventor', 'Eventor', 'administrator', 'eventor_options' , 'eventor_options_page');
+	
+	// add eventor deadlines tool if user is allowed to manage deadlines
+	if (current_user_can('edit_eventor_event_ids'))
+	{
+		add_management_page('Eventor deadlines', 'Eventor deadlines', get_user_role(), 'eventor_management' , 'eventor_management_page');
+	}
 }
 
 function eventor_management_page()
