@@ -14,6 +14,7 @@
 			<zipfileset dir="Queries" prefix="EventorPlugin/Queries" includes="*.php"/>
 			<zipfileset dir="." prefix="EventorPlugin" includes="EventorPlugin.php" />
 			<zipfileset dir="." prefix="EventorPlugin" includes="EventorQueryWidget.php" />
+			<zipfileset dir="cache" prefix="EventorPlugin/cache" excludes="*" />
 		</zip>
 	</target>
 	

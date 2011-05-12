@@ -55,13 +55,13 @@ function get_user_role() {
 	return $user_role;
 }
 
-/* 
+/*
  * action function for menu hook
  */
 function eventor_add_pages()
 {
 	add_options_page('Eventor', 'Eventor', 'administrator', 'eventor_options' , 'eventor_options_page');
-	
+
 	// add eventor deadlines tool if user is allowed to manage deadlines
 	if (current_user_can('edit_eventor_event_ids'))
 	{
@@ -80,12 +80,14 @@ function eventor_management_page()
 		$opt_eventids_val = $_POST[ MT_EVENTOR_EVENTIDS ];
 
 		update_option( MT_EVENTOR_EVENTIDS, $opt_eventids_val );
-	}
-
-	?>
+		?>
 <div class="updated">
 <p><strong><?php _e('Eventor deadlines saved.', 'mt_trans_domain' ); ?></strong></p>
 </div>
+
+		<?php
+	}
+	?>
 
 	<?php
 	echo '<div class="wrap">';
