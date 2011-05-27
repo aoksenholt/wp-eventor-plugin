@@ -17,7 +17,8 @@ class EventorQueryWidget extends WP_Widget {
 
 		$this->availableQueries = array();
 
-		foreach ($classes as $clazz) {
+		foreach ($classes as $clazz) 
+		{
 			$reflect = new ReflectionClass($clazz);
 
 			if ($reflect->isSubclassOf(self::SUPERCLASS))

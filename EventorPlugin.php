@@ -15,6 +15,7 @@ define('MT_EVENTOR_APIKEY', 'mt_eventor_apikey');
 define('MT_EVENTOR_ORGID', 'mt_eventor_orgid');
 define('MT_EVENTOR_ACTIVITY_TTL', 'mt_eventor_activity_ttl');
 define('MT_EVENTOR_EVENTIDS', 'mt_eventor_eventids');
+define('MT_EVENTOR_CUSTOM_QUERY_PLUGIN', 'mt_eventor_custom_query_plugin');
 
 
 # Caching
@@ -39,76 +40,28 @@ function endsWith( $str, $sub )
 // Automatic include of Query classes
 function __autoload($class_name)
 {
-	if (endsWith($class_name, 'Query'))
-	include 'Queries/' .$class_name . '.php';
+	$includeBase = 'Queries/';
+
+	if (!endsWith($class_name, 'Query'))
+	{
+		return;
+	}
+	
+	$words = preg_split('/(?=[A-Z])/', $class_name);
+	
+	if ($words[1] == 'Custom')
+	{
+		// plugins/EventorPlugin-Nydalens/CustomNydalensQuery.php
+		$includeBase = dirname(__FILE__). '-' . $words[2] . '/';
+	}
+
+	include  $includeBase.$class_name . '.php';
 }
 
-/**
- * get current users role
- */
-function get_user_role() {
-	global $current_user;
-
-	$user_roles = $current_user->roles;
-	$user_role = array_shift($user_roles);
-
-	return $user_role;
-}
-
-/*
- * action function for menu hook
- */
+// action function for above hook
 function eventor_add_pages()
 {
-	add_options_page('Eventor', 'Eventor', 'administrator', 'eventor_options' , 'eventor_options_page');
-
-	// add eventor deadlines tool if user is allowed to manage deadlines
-	if (current_user_can('edit_eventor_event_ids'))
-	{
-		add_management_page('Eventor deadlines', 'Eventor deadlines', get_user_role(), 'eventor_management' , 'eventor_management_page');
-	}
-}
-
-function eventor_management_page()
-{
-	$hidden_field_name = 'mt_eventor_submit_hidden';
-
-	$opt_eventids_val = get_option( MT_EVENTOR_EVENTIDS );
-
-	if( $_POST[ $hidden_field_name ] == 'Y' )
-	{
-		$opt_eventids_val = $_POST[ MT_EVENTOR_EVENTIDS ];
-
-		update_option( MT_EVENTOR_EVENTIDS, $opt_eventids_val );
-		?>
-<div class="updated">
-<p><strong><?php _e('Eventor deadlines saved.', 'mt_trans_domain' ); ?></strong></p>
-</div>
-
-		<?php
-	}
-	?>
-
-	<?php
-	echo '<div class="wrap">';
-
-	echo "<h2>" . __( 'Eventor deadlines', 'mt_trans_domain' ) . "</h2>";
-	?>
-<form name="form1" method="post" action=""><input type="hidden"
-	name="<?php echo $hidden_field_name; ?>" value="Y">
-
-<p><?php _e("EventorIds to show:", 'mt_trans_domain' ); ?> <input
-	type="text" name="<?php echo MT_EVENTOR_EVENTIDS; ?>"
-	value="<?php echo $opt_eventids_val; ?>" size="50"> <em>Commas
-separeted list of Eventor Event IDs to show in deadlines widget</em></p>
-<hr />
-
-<p class="submit"><input type="submit" name="Submit"
-	value="<?php _e('Update Options', 'mt_trans_domain' ) ?>" /></p>
-<hr />
-</form>
-
-	<?php
+	add_options_page('Eventor', 'Eventor', 'administrator', 'eventor', 'eventor_options_page');
 }
 
 function eventor_options_page()
@@ -121,6 +74,7 @@ function eventor_options_page()
 	$opt_orgid_val = get_option( MT_EVENTOR_ORGID );
 	$opt_act_ttl_val = get_option( MT_EVENTOR_ACTIVITY_TTL );
 	$opt_eventids_val = get_option( MT_EVENTOR_EVENTIDS );
+	$opt_custom_query_plugin_val = get_option( MT_EVENTOR_CUSTOM_QUERY_PLUGIN );
 
 	// See if the user has posted us some information
 	// If they did, this hidden field will be set to 'Y'
@@ -131,6 +85,7 @@ function eventor_options_page()
 		$opt_orgid_val = $_POST[ MT_EVENTOR_ORGID ];
 		$opt_act_ttl_val = $_POST[ MT_EVENTOR_ACTIVITY_TTL ];
 		$opt_eventids_val = $_POST[ MT_EVENTOR_EVENTIDS ];
+		$opt_custom_query_plugin_val = $_POST[ MT_EVENTOR_CUSTOM_QUERY_PLUGIN ];
 
 		// Save the posted value in the database
 		update_option( MT_EVENTOR_BASEURL, $opt_baseurl_val );
@@ -138,6 +93,7 @@ function eventor_options_page()
 		update_option( MT_EVENTOR_ORGID, $opt_orgid_val);
 		update_option( MT_EVENTOR_ACTIVITY_TTL, $opt_act_ttl_val );
 		update_option( MT_EVENTOR_EVENTIDS, $opt_eventids_val );
+		update_option( MT_EVENTOR_CUSTOM_QUERY_PLUGIN, $opt_custom_query_plugin_val);
 
 		// Put an options updated message on the screen
 
@@ -181,6 +137,11 @@ function eventor_options_page()
 <p><?php _e("Widget List EventIds:", 'mt_trans_domain' ); ?> <input
 	type="text" name="<?php echo MT_EVENTOR_EVENTIDS; ?>"
 	value="<?php echo $opt_eventids_val; ?>" size="50"></p>
+<hr />
+
+<p><?php _e("Custom Query Plugin Name:", 'mt_trans_domain' ); ?> <input
+	type="text" name="<?php echo MT_EVENTOR_CUSTOM_QUERY_PLUGIN; ?>"
+	value="<?php echo $opt_custom_query_plugin_val; ?>" size="50"></p>
 <hr />
 
 <p class="submit"><input type="submit" name="Submit"

@@ -35,11 +35,21 @@ abstract class Query
 	{
 		return $this->xml;
 	}
+	
+	protected function setXml($xml)
+	{
+		$this->xml = $xml;
+	}
 
 	// Property getter
 	public function getHtml()
 	{
 		return $this->html;
+	}
+	
+	protected function setHtml($html)
+	{
+		$this->html = $html;
 	}
 	 
 	//
@@ -64,7 +74,7 @@ abstract class Query
 		}
 	}
 
-	private function initCache($cacheKey)
+	protected function initCache($cacheKey)
 	{
 		if (!is_dir(CACHE))
 		{
@@ -75,7 +85,7 @@ abstract class Query
 		$this->cacheFile = CACHE . $cacheKey . ".cache";
 	}
 
-	private function loadFromEventor()
+	protected function loadFromEventor()
 	{
 		$url = $this->getQueryUrl();
 		$xml = $this->getXmlFromUrl($url);
@@ -83,8 +93,7 @@ abstract class Query
 		return $xml;
 	}
 
-
-	private function cacheLoad()
+	protected function cacheLoad()
 	{
 		if ($this->noCacheFileOrExpired())
 		{
@@ -94,21 +103,21 @@ abstract class Query
 		return file_get_contents($this->cacheFile);
 	}
 
-	private function noCacheFileOrExpired()
+	protected function noCacheFileOrExpired()
 	{
 		$cache = $this->cacheFile;
 
 		return !file_exists($cache) || (file_exists($cache) && filemtime($cache) < (time() - get_option(MT_EVENTOR_ACTIVITY_TTL)));
 	}
 
-	private function cachePut($html)
+	protected function cachePut($html)
 	{
 		$cachefile = fopen($this->cacheFile, 'wb');
 		fwrite($cachefile, $html);
 		fclose($cachefile);
 	}
 
-	private function getXmlFromUrl($url)
+	protected function getXmlFromUrl($url)
 	{
 		$url = get_option(MT_EVENTOR_BASEURL). '/api/' . $url;
 
