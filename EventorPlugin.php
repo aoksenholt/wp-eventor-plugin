@@ -51,7 +51,7 @@ function __autoload($class_name)
 	
 	if ($words[1] == 'Custom')
 	{
-		// plugins/EventorPlugin-Nydalens/CustomNydalensQuery.php
+		// Example: plugins/EventorPlugin-Nydalens/CustomNydalensQuery.php
 		$includeBase = dirname(__FILE__). '-' . $words[2] . '/';
 	}
 

@@ -11,8 +11,16 @@ class EventorQueryWidget extends WP_Widget {
 
 	function initAvailableQueries()
 	{
-		$this->loadQueryClasses();
-
+		$this->loadQueryClasses(dirname(__FILE__) . self::QUERIES_DIR);
+		
+		// Load all queries in parallel folders, starting with "EventorPlugin-"
+		$pluginQueryDirs = glob("" . dirname(__FILE__) . "-*");		
+		foreach ($pluginQueryDirs as $pluginQueryDir)
+		{
+			$this->loadQueryClasses($pluginQueryDir . '/');
+		}
+				
+		
 		$classes = get_declared_classes();
 
 		$this->availableQueries = array();
@@ -28,9 +36,9 @@ class EventorQueryWidget extends WP_Widget {
 		}
 	}
 
-	function loadQueryClasses()
-	{
-		$availabledQueries = glob("" . dirname(__FILE__) . self::QUERIES_DIR . "*Query.php");
+	function loadQueryClasses($searchDir)
+	{		
+		$availabledQueries = glob("" . $searchDir . "*Query.php");
 
 		foreach ($availabledQueries as $availableQuery)
 		{
