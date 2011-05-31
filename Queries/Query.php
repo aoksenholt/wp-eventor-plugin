@@ -35,7 +35,7 @@ abstract class Query
 	{
 		return $this->xml;
 	}
-	
+
 	protected function setXml($xml)
 	{
 		$this->xml = $xml;
@@ -46,12 +46,12 @@ abstract class Query
 	{
 		return $this->html;
 	}
-	
+
 	protected function setHtml($html)
 	{
 		$this->html = $html;
 	}
-	 
+
 	//
 	public function load()
 	{
@@ -121,26 +121,10 @@ abstract class Query
 	{
 		$url = get_option(MT_EVENTOR_BASEURL). '/api/' . $url;
 
-		// create curl resource
-		$ch = curl_init();
-		// set url
-		curl_setopt($ch, CURLOPT_URL, $url);
-		// return the transfer as a string
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		$headers = array('ApiKey' => get_option(MT_EVENTOR_APIKEY));
+		
+		$response = wp_remote_get($url, array('headers' => $headers, 'sslverify' => false));
 
-		// set header
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array("ApiKey: " . get_option(MT_EVENTOR_APIKEY)));
-
-		// $output contains the output string
-		$output = curl_exec($ch);
-
-		if (!$output)
-		echo curl_error($ch);
-
-		// close curl resource to free up system resources
-		curl_close($ch);
-
-		return $output;
+		return $response['body'];
 	}
 }
