@@ -25,7 +25,7 @@ abstract class Query
 {
 	private $xml;
 	private $html;
-	private $cacheFile;
+	private $transient;
 
 	protected abstract function getQueryUrl();
 	protected abstract function formatHtml($xml);
@@ -65,7 +65,7 @@ abstract class Query
 
 		$this->html = $this->cacheLoad();
 
-		if(empty($this->html))
+		if($this->html === 0)
 		{
 			$this->xml = $this->loadFromEventor();
 			$this->html = $this->formatHtml($this->xml);
@@ -76,13 +76,9 @@ abstract class Query
 
 	protected function initCache($cacheKey)
 	{
-		if (!is_dir(CACHE))
-		{
-			mkdir(CACHE);
-		}
-			
 		$cacheKey = get_class($this).$cacheKey;
-		$this->cacheFile = CACHE . $cacheKey . ".cache";
+		$this->transient = $cacheKey;
+
 	}
 
 	protected function loadFromEventor()
@@ -95,26 +91,18 @@ abstract class Query
 
 	protected function cacheLoad()
 	{
-		if ($this->noCacheFileOrExpired())
-		{
-			return;
+		$rv = get_transient($this->transient);
+
+		if (false === $rv) {
+			return 0;
 		}
 
-		return file_get_contents($this->cacheFile);
-	}
-
-	protected function noCacheFileOrExpired()
-	{
-		$cache = $this->cacheFile;
-
-		return !file_exists($cache) || (file_exists($cache) && filemtime($cache) < (time() - get_option(MT_EVENTOR_ACTIVITY_TTL)));
+		return $rv;
 	}
 
 	protected function cachePut($html)
 	{
-		$cachefile = fopen($this->cacheFile, 'wb');
-		fwrite($cachefile, $html);
-		fclose($cachefile);
+		set_transient($this->transient, $html, get_option(MT_EVENTOR_ACTIVITY_TTL));
 	}
 
 	protected function getXmlFromUrl($url)
@@ -122,7 +110,7 @@ abstract class Query
 		$url = get_option(MT_EVENTOR_BASEURL). '/api/' . $url;
 
 		$headers = array('ApiKey' => get_option(MT_EVENTOR_APIKEY));
-		
+
 		$response = wp_remote_get($url, array('headers' => $headers, 'sslverify' => false));
 
 		return $response['body'];
