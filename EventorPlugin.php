@@ -16,10 +16,7 @@ define('MT_EVENTOR_ORGID', 'mt_eventor_orgid');
 define('MT_EVENTOR_ACTIVITY_TTL', 'mt_eventor_activity_ttl');
 define('MT_EVENTOR_EVENTIDS', 'mt_eventor_eventids');
 define('MT_EVENTOR_CUSTOM_QUERY_PLUGIN', 'mt_eventor_custom_query_plugin');
-
-
-# Caching
-define('CACHE', dirname(__FILE__) . '/cache/');
+define('MT_EVENTOR_CACHE_KEYS', 'mt_eventor_cache_keys');
 
 add_action('widgets_init', 'add_widget');
 
@@ -46,9 +43,9 @@ function __autoload($class_name)
 	{
 		return;
 	}
-	
+
 	$words = preg_split('/(?=[A-Z])/', $class_name);
-	
+
 	if ($words[1] == 'Custom')
 	{
 		// Example: plugins/EventorPlugin-Nydalens/CustomNydalensQuery.php
@@ -86,6 +83,7 @@ function eventor_options_page()
 		$opt_act_ttl_val = $_POST[ MT_EVENTOR_ACTIVITY_TTL ];
 		$opt_eventids_val = $_POST[ MT_EVENTOR_EVENTIDS ];
 		$opt_custom_query_plugin_val = $_POST[ MT_EVENTOR_CUSTOM_QUERY_PLUGIN ];
+		$opt_clear_cache = $_POST[ MT_EVENTOR_CACHE_KEYS ];
 
 		// Save the posted value in the database
 		update_option( MT_EVENTOR_BASEURL, $opt_baseurl_val );
@@ -95,8 +93,16 @@ function eventor_options_page()
 		update_option( MT_EVENTOR_EVENTIDS, $opt_eventids_val );
 		update_option( MT_EVENTOR_CUSTOM_QUERY_PLUGIN, $opt_custom_query_plugin_val);
 
-		// Put an options updated message on the screen
-
+		if ($opt_clear_cache == "on")
+		{
+			$cacheKeys = explode(";", get_option(MT_EVENTOR_CACHE_KEYS));
+				
+			foreach ($cacheKeys as $key)
+			{
+				delete_transient($key);
+				delete_option(MT_EVENTOR_CACHE_KEYS);
+			}
+		}
 		?>
 <div class="updated">
 <p><strong><?php _e('Eventor settings saved.', 'mt_trans_domain' ); ?></strong></p>
@@ -132,16 +138,18 @@ function eventor_options_page()
 <p><?php _e("Club activities TTL:", 'mt_trans_domain' ); ?> <input
 	type="text" name="<?php echo MT_EVENTOR_ACTIVITY_TTL; ?>"
 	value="<?php echo $opt_act_ttl_val; ?>" size="50"></p>
-<hr />
 
 <p><?php _e("Widget List EventIds:", 'mt_trans_domain' ); ?> <input
 	type="text" name="<?php echo MT_EVENTOR_EVENTIDS; ?>"
 	value="<?php echo $opt_eventids_val; ?>" size="50"></p>
-<hr />
 
 <p><?php _e("Custom Query Plugin Name:", 'mt_trans_domain' ); ?> <input
 	type="text" name="<?php echo MT_EVENTOR_CUSTOM_QUERY_PLUGIN; ?>"
 	value="<?php echo $opt_custom_query_plugin_val; ?>" size="50"></p>
+
+<p><?php _e("Clear cache: ", 'mt_trans_domain');?><input type="checkbox"
+	name="<?php echo MT_EVENTOR_CACHE_KEYS; ?>" /></p>
+
 <hr />
 
 <p class="submit"><input type="submit" name="Submit"

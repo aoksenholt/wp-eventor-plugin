@@ -102,7 +102,37 @@ abstract class Query
 
 	protected function cachePut($html)
 	{
+		$this->updateCacheKeys($this->transient);
+
 		set_transient($this->transient, $html, get_option(MT_EVENTOR_ACTIVITY_TTL));
+	}
+
+	protected function updateCacheKeys($newKey)
+	{
+		$keys = get_option(MT_EVENTOR_CACHE_KEYS);
+		$existingKeys = explode(';', $keys);
+		$keyExists = false;
+
+		foreach ($existingKeys as $key) {
+			if ($key == $newKey) {
+				$keyExists = true;
+				return;
+			}
+		}
+
+		if (!$keyExists)
+		{
+			if (count($existingKeys) > 1)
+			{
+				$keys .= ";" . $newKey;
+			}
+			else
+			{
+				$keys = $newKey;
+			}
+
+			update_option(MT_EVENTOR_CACHE_KEYS, $keys);
+		}
 	}
 
 	protected function getXmlFromUrl($url)
