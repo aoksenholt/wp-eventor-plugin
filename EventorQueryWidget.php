@@ -19,8 +19,7 @@ class EventorQueryWidget extends WP_Widget {
 		{
 			$this->loadQueryClasses($pluginQueryDir . '/');
 		}
-				
-		
+						
 		$classes = get_declared_classes();
 
 		$this->availableQueries = array();

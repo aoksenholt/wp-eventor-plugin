@@ -41,6 +41,16 @@ abstract class Query
 		$this->xml = $xml;
 	}
 
+	protected function getOrgId()
+	{
+		return get_option(MT_EVENTOR_ORGID);
+	}
+	
+	protected function getEventorBaseUrl()
+	{
+		return get_option(MT_EVENTOR_BASEURL);
+	}
+	
 	// Property getter
 	public function getHtml()
 	{
@@ -120,15 +130,13 @@ abstract class Query
 			update_option(MT_EVENTOR_CACHE_KEYS, $keys);
 		}
 	}
-
+	
 	protected function getXmlFromUrl($url)
 	{
 		$url = get_option(MT_EVENTOR_BASEURL). '/api/' . $url;
-
-		$headers = array('ApiKey' => get_option(MT_EVENTOR_APIKEY));
-
+		$headers = array('ApiKey' => get_option(MT_EVENTOR_APIKEY));		
 		$response = wp_remote_get($url, array('headers' => $headers, 'sslverify' => false));
-
-		return $response['body'];
+			
+		return $response['body'];				
 	}
 }
