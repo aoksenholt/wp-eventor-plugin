@@ -110,24 +110,20 @@ abstract class Query
 	protected function updateCacheKeys($newKey)
 	{
 		$keys = get_option(MT_EVENTOR_CACHE_KEYS);
-		$existingKeys = explode(';', $keys);
 
-		foreach ($existingKeys as $key) {
-			if ($key == $newKey) {
-				return;
+		if (!strpos($keys, $newKey) > 0)
+		{
+			if (strlen($keys) > 0)
+			{
+				$keys .= ";" . $newKey;
 			}
-		}
+			else
+			{
+				$keys = $newKey;
+			}
 
-		if (count($existingKeys) > 1)
-		{
-			$keys .= ";" . $newKey;
+			update_option(MT_EVENTOR_CACHE_KEYS, $keys);
 		}
-		else
-		{
-			$keys = $newKey;
-		}
-
-		update_option(MT_EVENTOR_CACHE_KEYS, $keys);
 	}
 
 	protected function getXmlFromUrl($url)
