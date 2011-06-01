@@ -111,16 +111,11 @@ abstract class Query
 	{
 		$keys = get_option(MT_EVENTOR_CACHE_KEYS);
 
+		$newKey = $newKey . ";";
+
 		if (!strpos($keys, $newKey) > 0)
 		{
-			if (strlen($keys) > 0)
-			{
-				$keys .= ";" . $newKey;
-			}
-			else
-			{
-				$keys = $newKey;
-			}
+			$keys .= $newKey;
 
 			update_option(MT_EVENTOR_CACHE_KEYS, $keys);
 		}
