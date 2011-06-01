@@ -7,7 +7,7 @@ class ActivityDeadlinesQuery extends Query
 		$fromDate = date("Y-m-d");
 		$toDate = date("Y-m-d", strtotime("+1 year", strtotime($fromDate)));
 
-		$url = "activities?organisationId=" . get_option(MT_EVENTOR_ORGID) . "&from=" . $fromDate . "&to=" . $toDate . "&includeRegistrations=false";
+		$url = "activities?organisationId=" . $this->getOrgId() . "&from=" . $fromDate . "&to=" . $toDate . "&includeRegistrations=false";
 
 		return $url;
 	}

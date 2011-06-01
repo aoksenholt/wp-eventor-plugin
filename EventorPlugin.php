@@ -15,7 +15,6 @@ define('MT_EVENTOR_APIKEY', 'mt_eventor_apikey');
 define('MT_EVENTOR_ORGID', 'mt_eventor_orgid');
 define('MT_EVENTOR_ACTIVITY_TTL', 'mt_eventor_activity_ttl');
 define('MT_EVENTOR_EVENTIDS', 'mt_eventor_eventids');
-define('MT_EVENTOR_CUSTOM_QUERY_PLUGIN', 'mt_eventor_custom_query_plugin');
 define('MT_EVENTOR_CACHE_KEYS', 'mt_eventor_cache_keys');
 
 add_action('widgets_init', 'add_widget');
@@ -52,13 +51,28 @@ function __autoload($class_name)
 		$includeBase = dirname(__FILE__). '-' . $words[2] . '/';
 	}
 
-	include  $includeBase.$class_name . '.php';
+	$filename = $includeBase.$class_name . '.php';
+		
+	include $filename;
 }
 
 // action function for above hook
 function eventor_add_pages()
 {
-	add_options_page('Eventor', 'Eventor', 'administrator', 'eventor', 'eventor_options_page');
+	add_menu_page('Eventor', 'Eventor', 'administrator', 'eventor', 'eventor_options_page');
+	add_submenu_page('eventor', 'Eventor', 'Eventor', 'administrator', 'eventor', 'eventor_options_page');
+	add_submenu_page('eventor', 'Eventor API', 'API Test', 'administrator', 'eventor_api_test', 'eventor_apitest_page');
+	add_submenu_page('eventor', 'Eventor Query Test', 'Query Debug', 'administrator', 'eventor_query_test', 'eventor_querytest_page');
+}
+
+function eventor_apitest_page()
+{
+	require_once 'EventorApiTest.php';
+}
+
+function eventor_querytest_page()
+{
+	require_once 'QueryTest.php';
 }
 
 function eventor_options_page()
@@ -71,7 +85,6 @@ function eventor_options_page()
 	$opt_orgid_val = get_option( MT_EVENTOR_ORGID );
 	$opt_act_ttl_val = get_option( MT_EVENTOR_ACTIVITY_TTL );
 	$opt_eventids_val = get_option( MT_EVENTOR_EVENTIDS );
-	$opt_custom_query_plugin_val = get_option( MT_EVENTOR_CUSTOM_QUERY_PLUGIN );
 
 	// See if the user has posted us some information
 	// If they did, this hidden field will be set to 'Y'
@@ -81,8 +94,7 @@ function eventor_options_page()
 		$opt_apikey_val = $_POST[ MT_EVENTOR_APIKEY ];
 		$opt_orgid_val = $_POST[ MT_EVENTOR_ORGID ];
 		$opt_act_ttl_val = $_POST[ MT_EVENTOR_ACTIVITY_TTL ];
-		$opt_eventids_val = $_POST[ MT_EVENTOR_EVENTIDS ];
-		$opt_custom_query_plugin_val = $_POST[ MT_EVENTOR_CUSTOM_QUERY_PLUGIN ];
+		$opt_eventids_val = $_POST[ MT_EVENTOR_EVENTIDS ];		
 		$opt_clear_cache = $_POST[ MT_EVENTOR_CACHE_KEYS ];
 
 		// Save the posted value in the database
@@ -91,7 +103,6 @@ function eventor_options_page()
 		update_option( MT_EVENTOR_ORGID, $opt_orgid_val);
 		update_option( MT_EVENTOR_ACTIVITY_TTL, $opt_act_ttl_val );
 		update_option( MT_EVENTOR_EVENTIDS, $opt_eventids_val );
-		update_option( MT_EVENTOR_CUSTOM_QUERY_PLUGIN, $opt_custom_query_plugin_val);
 
 		if ($opt_clear_cache == "on")
 		{
@@ -122,39 +133,43 @@ function eventor_options_page()
 
 <form name="form1" method="post" action=""><input type="hidden"
 	name="<?php echo $hidden_field_name; ?>" value="Y">
+<table>
+<tr>
+	<td><?php _e("Base URL:", 'mt_trans_domain' ); ?> </td>
+	<td><input type="text" name="<?php echo MT_EVENTOR_BASEURL; ?>" value="<?php echo $opt_baseurl_val; ?>" size="50"></td>
+	<td></td>
+</tr>
+<tr>
+	<td><?php _e("API Key:", 'mt_trans_domain' ); ?></td>
+	<td><input type="text" name="<?php echo MT_EVENTOR_APIKEY; ?>" value="<?php echo $opt_apikey_val; ?>" size="50"></td>
+	<td></td>
+</tr>
+<tr>
+	<td><?php _e("Organisation ID:", 'mt_trans_domain' ); ?></td>
+	<td><input type="text" name="<?php echo MT_EVENTOR_ORGID; ?>" value="<?php echo $opt_orgid_val; ?>" size="50"></td>
+	<td></td>
+</tr>
+<tr>
+	<td><?php _e("Cache Time (sec):", 'mt_trans_domain' ); ?></td>
+	<td><input type="text" name="<?php echo MT_EVENTOR_ACTIVITY_TTL; ?>" value="<?php echo $opt_act_ttl_val; ?>" size="50"></td>
+	<td></td>
+</tr>
+<tr>
+	<td><?php _e("Widget List EventIds:", 'mt_trans_domain' ); ?></td>
+	<td><input type="text" name="<?php echo MT_EVENTOR_EVENTIDS; ?>" value="<?php echo $opt_eventids_val; ?>" size="50"></td>
+	<td><i>Events of interest. Used in certain widgets.</i></td>
+</tr>
+<tr>
+	<td><?php _e("Clear cache: ", 'mt_trans_domain');?></td>
+	<td><input type="checkbox" name="<?php echo MT_EVENTOR_CACHE_KEYS; ?>" /></td>
+	<td></td>
+</tr>
+</table>
 
-<p><?php _e("Base URL:", 'mt_trans_domain' ); ?> <input type="text"
-	name="<?php echo MT_EVENTOR_BASEURL; ?>"
-	value="<?php echo $opt_baseurl_val; ?>" size="50"></p>
+<p class="submit">
+	<input type="submit" name="Submit" value="<?php _e('Update Options', 'mt_trans_domain' ) ?>" />
+</p>
 
-<p><?php _e("API Key:", 'mt_trans_domain' ); ?> <input type="text"
-	name="<?php echo MT_EVENTOR_APIKEY; ?>"
-	value="<?php echo $opt_apikey_val; ?>" size="50"></p>
-
-<p><?php _e("Organisation ID:", 'mt_trans_domain' ); ?> <input
-	type="text" name="<?php echo MT_EVENTOR_ORGID; ?>"
-	value="<?php echo $opt_orgid_val; ?>" size="50"></p>
-
-<p><?php _e("Club activities TTL:", 'mt_trans_domain' ); ?> <input
-	type="text" name="<?php echo MT_EVENTOR_ACTIVITY_TTL; ?>"
-	value="<?php echo $opt_act_ttl_val; ?>" size="50"></p>
-
-<p><?php _e("Widget List EventIds:", 'mt_trans_domain' ); ?> <input
-	type="text" name="<?php echo MT_EVENTOR_EVENTIDS; ?>"
-	value="<?php echo $opt_eventids_val; ?>" size="50"></p>
-
-<p><?php _e("Custom Query Plugin Name:", 'mt_trans_domain' ); ?> <input
-	type="text" name="<?php echo MT_EVENTOR_CUSTOM_QUERY_PLUGIN; ?>"
-	value="<?php echo $opt_custom_query_plugin_val; ?>" size="50"></p>
-
-<p><?php _e("Clear cache: ", 'mt_trans_domain');?><input type="checkbox"
-	name="<?php echo MT_EVENTOR_CACHE_KEYS; ?>" /></p>
-
-<hr />
-
-<p class="submit"><input type="submit" name="Submit"
-	value="<?php _e('Update Options', 'mt_trans_domain' ) ?>" /></p>
-<hr />
 
 </form>
 	<?php
