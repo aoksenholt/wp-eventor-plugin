@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<project name="EventorPlugin" default="package" basedir=".">
+
+	<property name="src" value="." />
+	<property name="target" value="target" />
+
+	<target name="init">
+		<mkdir dir="${target}" />
+	</target>
+
+	<!-- package plugin for deployment -->
+	<target name="package" depends="init">
+		<zip destfile="${target}/EventorPlugin.zip">
+			<zipfileset dir="Queries" prefix="EventorPlugin/Queries" includes="*.php"/>
+			<zipfileset dir="." prefix="EventorPlugin" includes="EventorPlugin.php" />
+			<zipfileset dir="." prefix="EventorPlugin" includes="EventorQueryWidget.php" />
+			<zipfileset dir="cache" prefix="EventorPlugin/cache" excludes="*" />
+		</zip>
+	</target>
+	
+</project>
