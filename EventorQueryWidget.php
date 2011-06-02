@@ -69,35 +69,62 @@ class EventorQueryWidget extends WP_Widget {
 		$title = esc_attr($instance['title']);
 		$query =  esc_attr($instance['query']);
 		?>
-<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:'); ?>
-<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>"
-	name="<?php echo $this->get_field_name('title'); ?>" type="text"
-	value="<?php echo $title; ?>" /></label></p>
-
-<p><label for="<?php echo $this->get_field_id('query'); ?>"><?php _e('Query:'); ?>
-<select class="widefat" id="<?php echo $this->get_field_id('query'); ?>"
-	name="<?php echo $this->get_field_name('query'); ?>">
-	<?php
-	foreach ($this->availableQueries as $availableQuery)
-	{
-		$selected = false;
-
-		if ($availableQuery == $query)
+	<p>
+		<label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:'); ?>
+			<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>"	name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $title; ?>" />
+		</label>
+	</p>
+	<p>
+		<label for="<?php echo $this->get_field_id('query'); ?>"><?php _e('Query:'); ?>
+			<select class="widefat" id="<?php echo $this->get_field_id('query'); ?>" name="<?php echo $this->get_field_name('query'); ?>">
+			<?php
+			foreach ($this->availableQueries as $availableQuery)
+			{
+				$selected = false;
+		
+				if ($availableQuery == $query)
+				{
+					$selected = true;
+				}
+			?>
+				<option value="<?php echo $availableQuery; ?>"
+			<?php 
+				if ($selected) echo " selected=\"yes\""; ?>><?php echo $availableQuery; ?>
+				</option>
+			<?php
+			}
+			?>
+			</select> 
+		</label>
+	</p>
+	<p>Save to see eventual parameters below.</p>
+		<?php
+		
+		if (empty($query))
 		{
-			$selected = true;
+			return;
 		}
-		?>
-	<option value="<?php echo $availableQuery; ?>"
-	<?php if ($selected) echo " selected=\"yes\""; ?>><?php echo $availableQuery; ?></option>
-	<?php
+			
+		$queryInstance = new $query();
+		
+		$supportedParameters = $queryInstance->getSupportedParameters();
+		
+		foreach ($supportedParameters as $parameter => $defaultValue)
+		{
+			$value = $instance[$parameter];
+					
+			if (empty($value))
+			{
+				$value = $defaultValue;
+			}
+		
+			echo '<p><label for="'. $this->get_field_id($parameter).'">'.$parameter.'<input class="widefat" type="text" id="'.$this->get_field_id($parameter).'" name="'.$this->get_field_name($parameter).'" value="'.$value.'" /></p>';		
+		}		
 	}
-	?>
-</select> </label></p>
-	<?php
-	}
-
+	
 	function update($new_instance, $old_instance)
 	{
+		echo 'TESTING';		
 		// processes widget options to be saved
 		return $new_instance;
 	}
@@ -113,6 +140,8 @@ class EventorQueryWidget extends WP_Widget {
 		$queryType = $instance['query'];
 		$query = new $queryType();
 
+		$query->setParameterValues($instance);
+				
 		// provide widget_id for separate caching.
 		$query->loadWithCacheKey($args['widget_id']);
 

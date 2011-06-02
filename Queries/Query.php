@@ -14,7 +14,6 @@
  * Design Pattern: Abstract Method
  *
  * Usage:
- *
  * $query = new RealQuery();
  * $query->load();
  * OR $query->loadWithCacheKey($args['widget_id']);
@@ -26,11 +25,39 @@ abstract class Query
 	private $xml;
 	private $html;
 	private $transient;
+	private $parameterValues;
 
+	/*** COMMON OVERRIDES START ***/
+	
+	// Return the url part after /api/
 	protected abstract function getQueryUrl();
+	
+	// Input is xml from Eventor.
+	// Return the Html ready to display.
 	protected abstract function formatHtml($xml);
 
-	// Property getter
+	/* Override to support widget parameters. The array returned may contain default values.	
+	*  Example no defaults: return array('orgids', 'month');
+	*  Example with defaults: return array('orgids' => $this->getOrgId(), 'month' => '06');
+	*  IMPORTANT: Keys must be lowercase to support wp shortcodes.
+	*/
+	public function getSupportedParameters()
+	{
+		return array();
+	}	
+	/*** COMMON OVERRIDES END ***/
+	
+	/*** PROPERTY ACCESSORS START ***/
+	public function setParameterValues($array)
+	{
+		$this->parameterValues = $array;
+	}
+	
+	public function getParameterValues()
+	{
+		return $this->parameterValues;
+	}
+		
 	public function getXml()
 	{
 		return $this->xml;
@@ -39,16 +66,6 @@ abstract class Query
 	protected function setXml($xml)
 	{
 		$this->xml = $xml;
-	}
-
-	protected function getOrgId()
-	{
-		return get_option(MT_EVENTOR_ORGID);
-	}
-	
-	protected function getEventorBaseUrl()
-	{
-		return get_option(MT_EVENTOR_BASEURL);
 	}
 	
 	// Property getter
@@ -61,8 +78,20 @@ abstract class Query
 	{
 		$this->html = $html;
 	}
-
-	//
+	/*** PROPERTY ACCESSORS END ***/
+	
+	// Option helper
+	protected function getOrgId()
+	{
+		return get_option(MT_EVENTOR_ORGID);
+	}
+	
+	// Option helper
+	protected function getEventorBaseUrl()
+	{
+		return get_option(MT_EVENTOR_BASEURL);
+	}
+		
 	public function load()
 	{
 		$this->loadWithCacheKey('');
@@ -87,8 +116,15 @@ abstract class Query
 	protected function initCache($cacheKey)
 	{
 		$cacheKey = get_class($this).$cacheKey;
+		
+		// Parameters must be included in cache key.
+		$values = $this->getParameterValues();				
+		foreach ($this->getSupportedParameters() as $key => $value)
+		{			
+			$cacheKey .= $values[$key];
+		}
+		
 		$this->transient = $cacheKey;
-
 	}
 
 	protected function loadFromEventor()
@@ -123,7 +159,8 @@ abstract class Query
 
 		$newKey = $newKey . ";";
 
-		if (!strpos($keys, $newKey) > 0)
+		// Add cache key if not already present.
+		if (false === strpos($keys, $newKey))
 		{
 			$keys .= $newKey;
 
@@ -131,6 +168,7 @@ abstract class Query
 		}
 	}
 	
+	// Actual call to Eventor
 	protected function getXmlFromUrl($url)
 	{
 		$url = get_option(MT_EVENTOR_BASEURL). '/api/' . $url;

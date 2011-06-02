@@ -22,10 +22,26 @@ add_action('widgets_init', 'add_widget');
 // Hook for adding admin menus
 add_action('admin_menu', 'eventor_add_pages');
 
+add_shortcode('eventor', 'eventor_query_shortcode');
+
 function add_widget()
 {
 	require_once 'EventorQueryWidget.php';
 	register_widget('EventorQueryWidget');
+}
+
+// [eventor Query="EventsFromOptionListQuery"]
+// With parameters: [eventor query="EventsForOrgsInMonthQuery" orgids="3,4,5", month="06"]
+function eventor_query_shortcode($atts){
+	
+	$queryType = $atts['query'];	
+	$query = new $queryType();
+	
+	// Just push the whole array to the Query. It will pick relevant values.
+	$query->setParameterValues($atts);
+	$query->load();
+
+	return $query->getHtml();	
 }
 
 function endsWith( $str, $sub )
