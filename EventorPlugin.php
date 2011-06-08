@@ -76,7 +76,7 @@ function __autoload($class_name)
 function eventor_add_pages()
 {
 	add_menu_page('Eventor', 'Eventor', 'administrator', 'eventor', 'eventor_options_page');
-	add_submenu_page('eventor', 'Eventor', 'Eventor', 'administrator', 'eventor', 'eventor_options_page');
+	add_submenu_page('eventor', 'Options', 'Options', 'administrator', 'eventor', 'eventor_options_page');
 	add_submenu_page('eventor', 'Eventor API', 'API Test', 'administrator', 'eventor_api_test', 'eventor_apitest_page');
 	add_submenu_page('eventor', 'Eventor Query Test', 'Query Debug', 'administrator', 'eventor_query_test', 'eventor_querytest_page');
 }

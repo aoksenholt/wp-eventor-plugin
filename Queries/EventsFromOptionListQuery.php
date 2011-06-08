@@ -7,7 +7,7 @@ class EventsFromOptionListQuery extends Query
 		$fromDate = date("Y-m-d");
 		$toDate = date("Y-m-d", strtotime("+1 year", strtotime($fromDate)));
 
-		$url = "events?eventIds=" . $this->getOrgId() . "&from=" . $fromDate . "&to=" . $toDate . "&includeEntryBreaks=true";
+		$url = "events?eventIds=" . get_option(MT_EVENTOR_EVENTIDS) . "&from=" . $fromDate . "&to=" . $toDate . "&includeEntryBreaks=true";
 
 		return $url;
 	}

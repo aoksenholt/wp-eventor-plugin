@@ -103,10 +103,10 @@ abstract class Query
 		$this->initCache($cacheKey);
 
 		$this->html = $this->cacheLoad();
-
+		
 		if($this->html === 0)
-		{
-			$this->xml = $this->loadFromEventor();
+		{			
+			$this->xml = $this->loadFromEventor();									
 			$this->html = $this->formatHtml($this->xml);
 
 			$this->cachePut($this->html);
@@ -170,11 +170,13 @@ abstract class Query
 	
 	// Actual call to Eventor
 	protected function getXmlFromUrl($url)
-	{
+	{		
 		$url = get_option(MT_EVENTOR_BASEURL). '/api/' . $url;
 		$headers = array('ApiKey' => get_option(MT_EVENTOR_APIKEY));		
 		$response = wp_remote_get($url, array('headers' => $headers, 'sslverify' => false));
 			
-		return $response['body'];				
+		$xml = $response['body'];
+		
+		return $xml;				
 	}
 }
