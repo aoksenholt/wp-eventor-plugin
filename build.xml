@@ -5,13 +5,18 @@
 	<property name="target" value="target" />
 	<property name="cache" value="cache" />
 
+	<target name="clean">
+		<delete dir="${target}" />
+		<delete dir="${cache}" />
+	</target>
+
 	<target name="init">
 		<mkdir dir="${target}" />
 		<mkdir dir="${cache}" />
 	</target>
 
 	<!-- package plugin for deployment -->
-	<target name="package" depends="init">
+	<target name="package" depends="clean, init">
 		<zip destfile="${target}/EventorPlugin.zip">
 			<zipfileset dir="Queries" prefix="EventorPlugin/Queries" includes="*.php"/>
 			<zipfileset dir="." prefix="EventorPlugin" includes="EventorPlugin.php" />
