@@ -3,9 +3,11 @@
 
 	<property name="src" value="." />
 	<property name="target" value="target" />
+	<property name="cache" value="cache" />
 
 	<target name="init">
 		<mkdir dir="${target}" />
+		<mkdir dir="${cache}" />
 	</target>
 
 	<!-- package plugin for deployment -->
@@ -14,6 +16,9 @@
 			<zipfileset dir="Queries" prefix="EventorPlugin/Queries" includes="*.php"/>
 			<zipfileset dir="." prefix="EventorPlugin" includes="EventorPlugin.php" />
 			<zipfileset dir="." prefix="EventorPlugin" includes="EventorQueryWidget.php" />
+			<zipfileset dir="." prefix="EventorPlugin" includes="EventorApiTest.php" />
+			<zipfileset dir="." prefix="EventorPlugin" includes="QueryTest.php" />
+			<zipfileset dir="." prefix="EventorPlugin" includes="DebugFunctions.php" />
 			<zipfileset dir="cache" prefix="EventorPlugin/cache" excludes="*" />
 		</zip>
 	</target>
