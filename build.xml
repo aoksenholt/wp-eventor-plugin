@@ -19,12 +19,12 @@
 	<target name="package" depends="clean, init">
 		<zip destfile="${target}/EventorPlugin.zip">
 			<zipfileset dir="Queries" prefix="EventorPlugin/Queries" includes="*.php"/>
-			<zipfileset dir="." prefix="EventorPlugin" includes="EventorPlugin.php" />
-			<zipfileset dir="." prefix="EventorPlugin" includes="EventorQueryWidget.php" />
-			<zipfileset dir="." prefix="EventorPlugin" includes="EventorApiTest.php" />
-			<zipfileset dir="." prefix="EventorPlugin" includes="QueryTest.php" />
-			<zipfileset dir="." prefix="EventorPlugin" includes="DebugFunctions.php" />
-			<zipfileset dir="cache" prefix="EventorPlugin/cache" excludes="*" />
+			<zipfileset dir="${src}" prefix="EventorPlugin" includes="EventorPlugin.php" />
+			<zipfileset dir="${src}" prefix="EventorPlugin" includes="EventorQueryWidget.php" />
+			<zipfileset dir="${src}" prefix="EventorPlugin" includes="EventorApiTest.php" />
+			<zipfileset dir="${src}" prefix="EventorPlugin" includes="QueryTest.php" />
+			<zipfileset dir="${src}" prefix="EventorPlugin" includes="DebugFunctions.php" />
+			<zipfileset dir="${cache}" prefix="EventorPlugin/cache" excludes="*" />
 		</zip>
 	</target>
 	
