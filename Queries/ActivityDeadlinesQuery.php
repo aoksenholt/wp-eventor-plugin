@@ -17,22 +17,36 @@ class ActivityDeadlinesQuery extends Query
 		$activities = array();
 
 		$doc = simplexml_load_string($xml);
-		$activityNodes = $doc->Activity;
+		$activityNodes = $doc;
 
+		$arr = array();
+
+		foreach ($activityNodes->Activity as $activity) 
+		{
+			$deadline = $activity['registrationDeadline'];
+			$name = $activity->Name;
+			
+			$key = "$deadline, $name";
+			
+			$arr[(string)$key] = $activity;
+		}
+		
+		ksort($arr);
+				
 		$data = '<ul>';
 
-		foreach ($doc->Activity as $activity)
+		foreach ($arr as $activity)
 		{
 			$name = $activity->Name;
 			$url = $activity['url'];
 			$numRegistrations = $activity['registrationCount'];
 			$registrationDeadline = $activity['registrationDeadline'];
 
-			$name = htmlentities($name);
+			$name = $name;
 			$date = new DateTime($registrationDeadline);
-			$registrationDeadline = $date->format('j/n H:i');
+			$registrationDeadline = $date->format('j/n');
 
-			$data .= "<li><a href=\"" . $url . "\">" . $name . "</a> (" . $numRegistrations . ") - " . $registrationDeadline . "</li>";
+			$data .= "<li><a href=\"" . $url . "\">" . $name . "</a> - (" . $numRegistrations . ") " . $registrationDeadline . "</li>";
 		}
 
 		$data .= '</ul>';

@@ -11,24 +11,36 @@ class EventsFromOptionListQuery extends Query
 
 		return $url;
 	}
-
+	
 	protected function formatHtml($xml)
 	{
 		$events = array();
 
 		$doc = simplexml_load_string($xml);
-		$eventNodes = $doc->Event;
+		$eventNodes = $doc;
 
+		foreach ($eventNodes->Event as $event) 
+		{
+			$date = $this->getNextDeadlineOrEventDate($event);
+			$name = $event->Name;
+			
+			$key = "$date, $name";
+			
+			$arr[(string)$key] = $event;
+		}
+		
+		ksort($arr);
+				
 		$data = '<ul>';
 
-		foreach ($doc->Event as $event)
+		foreach ($arr as $event)
 		{
 			$eventId = $event->EventId;
 			$name = utf8_decode($event->Name);
 
 			$eventorUrl = $this->getEventorBaseUrl() . '/Events/Show/'.$eventId;
 
-			$eventDate = $event->StartDate->Date;
+			$eventDate = $this->getNextDeadlineOrEventDate($event);
 
 			$name = htmlentities($name);
 			$eventDate = new DateTime($eventDate);
@@ -41,5 +53,36 @@ class EventsFromOptionListQuery extends Query
 
 		return $data;
 	}
+	
+	private function getNextDeadlineOrEventDate($event)
+	{
+		$date = $event->StartDate->Date;
+		return $date;
+		 
+		$arr = array();
+		
+		$today = "2012-04-10"; //date("Y-m-d");
+		
+		foreach($event->EntryBreak as $break)
+		{
+			$breakDate = $break->ValidToDate->Date;
+			
+			echo $breakDate ." ";
+			//if($breakDate >= $today)
+			//{
+				$arr[(string)$breakDate] = $breakDate;
+			//}
+		}
+		
+		ksort($arr);
+		
+		echo count($arr);
+		
+		if (count($arr) > 0)
+			return $arr[0];
+			
+		return $date;
+	}	
+	
 }
 ?>
