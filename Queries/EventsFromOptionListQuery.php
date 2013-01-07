@@ -61,6 +61,7 @@ class EventsFromOptionListQuery extends Query
 		 
 		$arr = array();
 		
+		// TODO: Manual testing. Fixit!
 		$today = "2012-04-10"; //date("Y-m-d");
 		
 		foreach($event->EntryBreak as $break)
