@@ -15,38 +15,42 @@ class ActivityDeadlinesQuery extends Query
 	protected function formatHtml($xml)
 	{
 		$activities = array();
+		$today = date("Y-m-d");
 
 		$doc = simplexml_load_string($xml);
 		$activityNodes = $doc;
 
 		$arr = array();
 
-		foreach ($activityNodes->Activity as $activity) 
+		foreach ($activityNodes->Activity as $activity)
 		{
 			$deadline = $activity['registrationDeadline'];
 			$name = $activity->Name;
-			
+				
 			$key = "$deadline, $name";
-			
+				
 			$arr[(string)$key] = $activity;
 		}
-		
+
 		ksort($arr);
-				
+
 		$data = '<ul>';
 
 		foreach ($arr as $activity)
 		{
-			$name = $activity->Name;
-			$url = $activity['url'];
-			$numRegistrations = $activity['registrationCount'];
-			$registrationDeadline = $activity['registrationDeadline'];
+			$visibleFrom = date("Y-m-d", strtotime($activity['visibleFrom']));
+			
+			if ($today >= $visibleFrom) {
+				$name = $activity->Name;
+				$url = $activity['url'];
+				$numRegistrations = $activity['registrationCount'];
+				$registrationDeadline = $activity['registrationDeadline'];
+					
+				$date = new DateTime($registrationDeadline);
+				$registrationDeadline = $date->format('j/n');
 
-			$name = $name;
-			$date = new DateTime($registrationDeadline);
-			$registrationDeadline = $date->format('j/n');
-
-			$data .= "<li><a href=\"" . $url . "\">" . $name . "</a> - (" . $numRegistrations . ") " . $registrationDeadline . "</li>";
+				$data .= "<li><a href=\"" . $url . "\">" . $name . "</a> - (" . $numRegistrations . ") " . $registrationDeadline . "</li>";
+			}
 		}
 
 		$data .= '</ul>';
