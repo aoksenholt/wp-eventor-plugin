@@ -39,8 +39,9 @@ class ActivityDeadlinesQuery extends Query
 		foreach ($arr as $activity)
 		{
 			$visibleFrom = date("Y-m-d", strtotime($activity['visibleFrom']));
+			$visibleTo = date("Y-m-d", strtotime($activity['visibleTo']));
 			
-			if ($today >= $visibleFrom) {
+			if ($today >= $visibleFrom && $today <= $visibleTo) {
 				$name = $activity->Name;
 				$url = $activity['url'];
 				$numRegistrations = $activity['registrationCount'];
