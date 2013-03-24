@@ -3,7 +3,7 @@
  Plugin Name: EventorPlugin
  Plugin URI: http://nydalen.idrett.no/eventorplugin
  Description: Plugin for fetching data from Eventor
- Version: 1.0.2
+ Version: 0.0.2
  Author: nsk
  Author URI: http://nydalen.idrett.no
  */
@@ -36,6 +36,19 @@ function eventor_query_shortcode($atts){
 	
 	$queryType = $atts['query'];	
 	$query = new $queryType();
+	
+	// 	overskriv attributter med verdier fra querystring
+	foreach($atts as $key => $value)	
+	{
+		$qs = $_GET[$key];
+		
+		if(!empty($qs))
+		{
+			$atts[$key] = $qs;
+		}
+		
+		//echo $atts[$key];
+	}
 	
 	// Just push the whole array to the Query. It will pick relevant values.
 	$query->setParameterValues($atts);

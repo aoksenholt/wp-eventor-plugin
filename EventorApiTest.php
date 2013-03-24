@@ -27,6 +27,11 @@ class DebugQuery extends Query
 	{
 		return '';
 	}	
+	
+	public function loadWithCacheKey($cacheKey)
+	{
+		$this->xml = $this->loadFromEventor();											
+	}
 }
 
 function doEventorApiCall()
