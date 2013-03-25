@@ -173,7 +173,7 @@ abstract class Query
 	{		
 		$url = get_option(MT_EVENTOR_BASEURL). '/api/' . $url;
 		$headers = array('ApiKey' => get_option(MT_EVENTOR_APIKEY));		
-		$response = wp_remote_get($url, array('headers' => $headers, 'sslverify' => false));
+		$response = wp_remote_get($url, array('headers' => $headers, 'sslverify' => false, 'timeout' => 60));
 			
 		$xml = $response['body'];
 		
