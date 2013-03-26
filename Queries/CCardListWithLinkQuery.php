@@ -3,7 +3,7 @@ class CCardListWithLinkQuery extends Query
 {
 	public function getSupportedParameters()
 	{
-		return array('orgid' => $this->getOrgId(), 'linkprefix' => '');		
+		return array('orgid' => $this->getOrgId(), 'link' => '');		
 	}
 	
 	protected function getQueryUrl()
@@ -28,7 +28,7 @@ class CCardListWithLinkQuery extends Query
 		$competitors = $doc;
 		
 		$p = $this->getParameterValues();
-		$linkPrefix = $p['linkprefix'];
+		$link = $p['link'];
 		
 		$arr = array();
 
@@ -71,7 +71,17 @@ class CCardListWithLinkQuery extends Query
 				}
 			}			
 			
-			$html .= "<tr><td><a href='$linkPrefix?personid=$personId&y=2012'>$lastname, $firstname</a></td><td>$emit</td><td>$si</td><td>$modified</td></tr>";
+			$linkHtml = "$lastname, $firstname";
+			
+			if($link != '')
+			{
+				$linkUrl = str_replace('{personid}', $personId, strtolower($link));
+				$linkUrl = str_replace('{year}', date('Y'), strtolower($linkUrl));
+			
+				$linkHtml = "<a href='$linkUrl'>$linkHtml</a>";
+			}
+			
+			$html .= "<tr><td>$linkHtml</td><td>$emit</td><td>$si</td><td>$modified</td></tr>";
 		}
 		$html .= '</table>';		
 
