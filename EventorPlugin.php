@@ -90,8 +90,14 @@ function eventor_add_pages()
 {
 	add_menu_page('Eventor', 'Eventor', 'administrator', 'eventor', 'eventor_options_page');
 	add_submenu_page('eventor', 'Options', 'Options', 'administrator', 'eventor', 'eventor_options_page');
+	add_submenu_page('eventor', 'Events', 'Events', 'administrator', 'eventor_events', 'eventor_events_page');
 	add_submenu_page('eventor', 'Eventor API', 'API Test', 'administrator', 'eventor_api_test', 'eventor_apitest_page');
 	add_submenu_page('eventor', 'Eventor Query Test', 'Query Debug', 'administrator', 'eventor_query_test', 'eventor_querytest_page');
+}
+
+function eventor_events_page()
+{
+	require_once 'EventorEventLinksPage.php';
 }
 
 function eventor_apitest_page()

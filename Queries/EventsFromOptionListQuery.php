@@ -54,14 +54,13 @@ class EventsFromOptionListQuery extends Query
 		return $data;
 	}
 	
-	private function getNextDeadlineOrEventDate($event)
+	protected function getNextDeadlineOrEventDate($event)
 	{
 		$date = $event->StartDate->Date;
 		return $date;
 		 
 		$arr = array();
 		
-		// TODO: Manual testing. Fixit!
 		$today = "2012-04-10"; //date("Y-m-d");
 		
 		foreach($event->EntryBreak as $break)
