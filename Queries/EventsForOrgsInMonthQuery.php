@@ -11,7 +11,7 @@ class EventsForOrgsInMonthQuery extends Query
 		$values = $this->getParameterValues();
 		
 		$orgIds = $values['orgids'];
-		$day = $value['day'];
+		$day = $values['day'];
 		$month = $values['month'];
 		$year = $values['year'];
 
