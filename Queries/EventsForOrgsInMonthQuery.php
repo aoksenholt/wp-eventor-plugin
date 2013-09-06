@@ -3,7 +3,7 @@ class EventsForOrgsInMonthQuery extends Query
 {
 	public function getSupportedParameters()
 	{
-		return array('orgids' => $this->getOrgId(), 'month' => '06');
+		return array('orgids' => $this->getOrgId(), 'day' => date('d'), 'month' => date('m'), year => date('Y'));
 	}
 	
 	protected function getQueryUrl()
@@ -11,10 +11,16 @@ class EventsForOrgsInMonthQuery extends Query
 		$values = $this->getParameterValues();
 		
 		$orgIds = $values['orgids'];
+		$day = $value['day'];
 		$month = $values['month'];
-		
-		$url = "events?organisationIds=$orgIds&fromDate=2011-$month-01&toDate=2011-$month-31";
+		$year = $values['year'];
 
+		if ($orgIds != "") {
+			$url = "events?organisationIds=$orgIds&fromDate=$year-$month-$day&toDate=$year-$month-31";
+		} else {
+			$url = "events?fromDate=$year-$month-$day&toDate=$year-$month-31";
+		}
+		
 		return $url;
 	}
 	
