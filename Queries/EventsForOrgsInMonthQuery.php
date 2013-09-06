@@ -26,11 +26,22 @@ class EventsForOrgsInMonthQuery extends Query
 	
 	protected function formatHtml($xml)
 	{
-		$events = array();
-
 		$doc = simplexml_load_string($xml);
 		$eventNodes = $doc->Event;
 
+		$events = array();
+		
+		foreach ($doc->Event as $event) {
+			$eventDate = $event->StartDate->Date;
+			$name = utf8_decode($event->Name);
+				
+			$key = "$eventDate, $name";
+				
+			$events[(string)$key] = $event;
+		}
+		
+		ksort($events);
+		
 		$data = '<ul>';
 
 		foreach ($doc->Event as $event)

@@ -3,7 +3,7 @@
  Plugin Name: EventorPlugin
  Plugin URI: http://nydalen.idrett.no/eventorplugin
  Description: Plugin for fetching data from Eventor
- Version: 1.2.0
+ Version: 1.2.1
  Author: nsk
  Author URI: http://nydalen.idrett.no
  */
