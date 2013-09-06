@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <project name="EventorPlugin" default="package" basedir=".">
 
+	<property file="build.properties"/>
+	
 	<property name="src" value="." />
 	<property name="target" value="target" />
 	<property name="cache" value="cache" />
@@ -17,9 +19,11 @@
 
 	<!-- package plugin for deployment -->
 	<target name="package" depends="clean, init">
-		<zip destfile="${target}/EventorPlugin.zip">
+		<copy file="EventorPlugin.php" tofile="tmp/EventorPlugin.php" />
+		<replace file="tmp/EventorPlugin.php" token="@version@" value="${version}"/>
+		<zip destfile="${target}/EventorPlugin-${version}.zip">
 			<zipfileset dir="Queries" prefix="EventorPlugin/Queries" includes="*.php"/>
-			<zipfileset dir="${src}" prefix="EventorPlugin" includes="EventorPlugin.php" />
+			<zipfileset dir="${src}/tmp" prefix="EventorPlugin" includes="EventorPlugin.php" />
 			<zipfileset dir="${src}" prefix="EventorPlugin" includes="EventorQueryWidget.php" />
 			<zipfileset dir="${src}" prefix="EventorPlugin" includes="EventorApiTest.php" />
 			<zipfileset dir="${src}" prefix="EventorPlugin" includes="QueryTest.php" />
