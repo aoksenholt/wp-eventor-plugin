@@ -31,22 +31,9 @@ class EventsForOrgsOutYearQuery extends Query
 		$doc = simplexml_load_string($xml);
 		$eventNodes = $doc->Event;
 
-		$events = array();
-		
-		foreach ($doc->Event as $event) {
-			$eventDate = $event->StartDate->Date;
-			$name = utf8_decode($event->Name);
-			
-			$key = "$eventDate, $name";
-			
-			$events[(string)$key] = $event;
-		}
-		
-		ksort($events);
-		
 		$data = '<ul>';
-		
-		foreach ($events as $event)
+
+		foreach ($doc->Event as $event)
 		{
 			$eventId = $event->EventId;
 			$name = utf8_decode($event->Name);
