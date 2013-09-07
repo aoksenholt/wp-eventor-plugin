@@ -36,8 +36,8 @@ class EventsForOrgsOutYearQuery extends Query
 		foreach ($doc->Event as $event)
 		{
 			$eventId = $event->EventId;
-			$name = utf8_decode($event->Name);
-
+			$name = $event->Name;
+				
 			$eventorUrl = $this->getEventorBaseUrl() . '/Events/Show/'.$eventId;
 
 			$eventDate = $event->StartDate->Date;
