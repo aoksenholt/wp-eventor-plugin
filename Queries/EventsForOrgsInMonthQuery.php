@@ -1,5 +1,5 @@
 <?php
-class EventsForOrgsInMonthQuery extends Query
+class EventsForOrgsInMonthQuery extends EventUtilsQuery
 {
 	public function getSupportedParameters()
 	{
@@ -26,14 +26,11 @@ class EventsForOrgsInMonthQuery extends Query
 	
 	protected function formatHtml($xml)
 	{
-		$events = array();
-
 		$doc = simplexml_load_string($xml);
-		$eventNodes = $doc->Event;
 
 		$data = '<ul>';
 
-		foreach ($doc->Event as $event)
+		foreach ($this->sortEvents($doc->Event) as $event)
 		{
 			$eventId = $event->EventId;
 			$name = $event->Name;
