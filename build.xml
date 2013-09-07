@@ -6,20 +6,23 @@
 	<property name="src" value="." />
 	<property name="target" value="target" />
 	<property name="cache" value="cache" />
+	<property name="tmp" value="tmp" />
 
 	<target name="clean">
 		<delete dir="${target}" />
 		<delete dir="${cache}" />
+		<delete dir="${tmp}" />
 	</target>
 
 	<target name="init">
 		<mkdir dir="${target}" />
 		<mkdir dir="${cache}" />
+		<mkdir dir="${tmp}" />
 	</target>
 
 	<!-- package plugin for deployment -->
 	<target name="package" depends="clean, init">
-		<copy file="EventorPlugin.php" tofile="tmp/EventorPlugin.php" />
+		<copy file="EventorPlugin.php" tofile="${src}/tmp/EventorPlugin.php" />
 		<replace file="tmp/EventorPlugin.php" token="@version@" value="${version}"/>
 		<zip destfile="${target}/EventorPlugin-${version}.zip">
 			<zipfileset dir="Queries" prefix="EventorPlugin/Queries" includes="*.php"/>
