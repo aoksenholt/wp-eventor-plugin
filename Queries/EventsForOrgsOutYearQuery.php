@@ -3,7 +3,7 @@ class EventsForOrgsOutYearQuery extends EventUtilsQuery
 {
 	public function getSupportedParameters()
 	{
-		return array('orgids' => $this->getOrgId(), 'day' => date('d'), 'month' => date('m'), year => date('Y'), 'classificationids' => '');
+		return array('orgids' => $this->getOrgId(), 'day' => date('d'), 'month' => date('m'), year => date('Y'), 'classificationids' => '', 'numdays' => '');
 	}
 	
 	protected function getQueryUrl()
@@ -15,17 +15,28 @@ class EventsForOrgsOutYearQuery extends EventUtilsQuery
 		$month = $values['month'];
 		$year = $values['year'];
 		$classificationIds = $values['classificationids'];
-
-		if ($orgIds != "") {
-			$url = "events?organisationIds=$orgIds&fromDate=$year-$month-$day&toDate=$year-12-31";
-		} else {
-			$url = "events?fromDate=$year-$month-$day&toDate=$year-12-31";
-		}
+		$numDays = $values['numdays'];
 		
+		$url = "events?fromDate=$year-$month-$day";
+		
+		if ($orgIds != "") {
+			$url .= "&organisationIds=$orgIds";
+		}
+
 		if ($classificationIds != "") {
 			$url .= "&classificationIds=$classificationIds";
 		}
 		
+		if ($numDays != "") {
+			$fromDate = date("Y-m-d");
+			echo $fromDate;
+			$toDate = date("Y-m-d", strtotime("+$numDays days", strtotime($fromDate)));
+			echo $toDate;
+			$url .= "&toDate=$toDate";
+		} else {
+			$url .= "&toDate=$year-12-31";
+		}
+		echo $url;
 		return $url;
 	}
 	
