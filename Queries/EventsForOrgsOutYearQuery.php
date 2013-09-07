@@ -29,14 +29,12 @@ class EventsForOrgsOutYearQuery extends EventUtilsQuery
 		
 		if ($numDays != "") {
 			$fromDate = date("Y-m-d");
-			echo $fromDate;
 			$toDate = date("Y-m-d", strtotime("+$numDays days", strtotime($fromDate)));
-			echo $toDate;
 			$url .= "&toDate=$toDate";
 		} else {
 			$url .= "&toDate=$year-12-31";
 		}
-		echo $url;
+
 		return $url;
 	}
 	
