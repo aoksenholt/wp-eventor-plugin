@@ -3,7 +3,7 @@ class EventsForOrgsOutYearQuery extends EventUtilsQuery
 {
 	public function getSupportedParameters()
 	{
-		return array('orgids' => $this->getOrgId(), 'day' => date('d'), 'month' => date('m'), year => date('Y'), 'classificationids' => '', 'numdays' => '');
+		return array('orgids' => $this->getOrgId(), 'classificationids' => '', 'numdays' => '');
 	}
 	
 	protected function getQueryUrl()
@@ -11,9 +11,9 @@ class EventsForOrgsOutYearQuery extends EventUtilsQuery
 		$values = $this->getParameterValues();
 		
 		$orgIds = $values['orgids'];
-		$day = $values['day'];
-		$month = $values['month'];
-		$year = $values['year'];
+		$day = date('d');
+		$month = date('m');
+		$year =  date('Y');
 		$classificationIds = $values['classificationids'];
 		$numDays = $values['numdays'];
 		
