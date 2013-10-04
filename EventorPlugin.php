@@ -8,6 +8,9 @@
  Author URI: http://nydalen.idrett.no
  */
 
+//error_reporting(E_ALL);
+//ini_set('display_errors', 1);
+
 // Check out Eventor API documentation on https://eventor.orientering.se/api/documentation
 
 define('MT_EVENTOR_BASEURL', 'mt_eventor_baseurl');
@@ -16,6 +19,17 @@ define('MT_EVENTOR_ORGID', 'mt_eventor_orgid');
 define('MT_EVENTOR_ACTIVITY_TTL', 'mt_eventor_activity_ttl');
 define('MT_EVENTOR_EVENTIDS', 'mt_eventor_eventids');
 define('MT_EVENTOR_CACHE_KEYS', 'mt_eventor_cache_keys');
+
+function loadQueries()
+{
+  @require_once dirname(__FILE__) ."/Queries/Query.php";
+  foreach (glob(dirname(__FILE__) ."/Queries/*Query.php") as $filename)
+  {        
+      @require_once $filename;
+  }
+}
+
+loadQueries();
 
 add_action('widgets_init', 'add_widget');
 
@@ -32,8 +46,8 @@ function add_widget()
 
 // [eventor Query="EventsFromOptionListQuery"]
 // With parameters: [eventor query="EventsForOrgsInMonthQuery" orgids="3,4,5", month="06"]
-function eventor_query_shortcode($atts){
-	
+function eventor_query_shortcode($atts)
+{	
 	$queryType = $atts['query'];	
 	$query = new $queryType();
 	
@@ -62,28 +76,45 @@ function endsWith( $str, $sub )
 	return ( substr( $str, strlen( $str ) - strlen( $sub ) ) == $sub );
 }
 
-// Automatic include of Query classes
-function __autoload($class_name)
-{
-	$includeBase = 'Queries/';
 
-	if (!endsWith($class_name, 'Query'))
-	{
-		return;
-	}
 
-	$words = preg_split('/(?=[A-Z])/', $class_name);
 
-	if ($words[1] == 'Custom')
-	{
-		// Example: plugins/EventorPlugin-Nydalens/CustomNydalensQuery.php
-		$includeBase = dirname(__FILE__). '-' . $words[2] . '/';
-	}
+// // Automatic include of Query classes
+// function __autoload($class_name)
+// {
+ // echo $class_name;
+	// $includeBase = 'Queries/';
 
-	$filename = $includeBase.$class_name . '.php';
-		
-	include $filename;
-}
+	// if (!endsWith($class_name, 'Query'))
+	// {
+		// return;
+	// }
+
+	// $words = preg_split('/(?=[A-Z])/', $class_name);
+
+	// if ($words[1] == 'Custom')
+	// {
+		// // Example: plugins/EventorPlugin-Nydalens/CustomNydalensQuery.php
+		// $includeBase = dirname(__FILE__). '-' . $words[2] . '/';
+	// }
+
+	// $filename = $includeBase.$class_name . '.php';
+	
+  // $file = $filename;
+  
+  // @require_once($file);
+	// include $filename;
+  // return;
+   // if (stristr(dirname(stream_resolve_include_path($file)), plugin_basename(__DIR__ ))) {
+   
+        // if (file_exists(stream_resolve_include_path($file)) && is_file(stream_resolve_include_path($file))) {
+            
+            // @require_once($file);
+
+        // }
+
+    // }
+// }
 
 // action function for above hook
 function eventor_add_pages()
@@ -96,7 +127,7 @@ function eventor_add_pages()
 }
 
 function eventor_events_page()
-{
+{    
 	require_once 'EventorEventLinksPage.php';
 }
 

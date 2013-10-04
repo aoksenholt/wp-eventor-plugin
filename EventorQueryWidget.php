@@ -6,7 +6,7 @@ class EventorQueryWidget extends WP_Widget {
 	private $availableQueries;
 
 	function EventorQueryWidget() {
-		parent::WP_Widget(false, 'Eventor Query');		
+		parent::WP_Widget(false, 'Eventor Query');   
 	}
 
 	function initAvailableQueries()
@@ -132,6 +132,7 @@ class EventorQueryWidget extends WP_Widget {
 	// Emit widget html
 	function widget($args, $instance)
 	{
+        
 		// TODO: Hide surrounding html based on widget new config setting 'hide_wordpress_widget_html'.
 		$args['title'] = $instance['title'];
 		echo $args['before_widget'] . $args['before_title'] . $args['title'] . $args['after_title'];

@@ -52,6 +52,11 @@ class AddressListQuery extends Query
       if(!empty($addressText))
         $addressText .= ', '.$address['zipCode'].' '.$address['city'];
 			
+      $addressText = htmlentities($addressText);
+
+      $personName = "$lastname, $firstname";
+      $personName = htmlentities($personName);
+
       $tele = $person->Tele;
       
       $email = $tele['mailAddress'];
@@ -66,7 +71,7 @@ class AddressListQuery extends Query
       if(!empty($mobile))
         $phone = $mobile;
 			
-			$html .= "<tr><td>$lastname, $firstname</td><td>$email</td><td>$phone</td><td>$addressText</td><td>$modified</td></tr>";
+			$html .= "<tr><td>$personName</td><td>$email</td><td>$phone</td><td>$addressText</td><td>$modified</td></tr>";
 		}
 		$html .= '</table>';		
 

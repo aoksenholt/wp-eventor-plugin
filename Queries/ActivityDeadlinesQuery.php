@@ -50,7 +50,7 @@ class ActivityDeadlinesQuery extends Query
 				$date = new DateTime($registrationDeadline);
 				$registrationDeadline = $date->format('j/n');
 
-				$data .= "<li><a href=\"" . $url . "\">" . $name . "</a> - (" . $numRegistrations . ") " . $registrationDeadline . "</li>";
+				$data .= "<li><a href=\"" . $url . "\">" . htmlentities($name) . "</a> - (" . $numRegistrations . ") " . $registrationDeadline . "</li>";
 			}
 		}
 
