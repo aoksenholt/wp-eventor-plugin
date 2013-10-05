@@ -23,7 +23,7 @@ class AddressListQuery extends Query
 	}
 
 	protected function formatHtml($xml)
-	{							
+	{
 		$doc = simplexml_load_string($xml);				
 		$personList = $doc;
 		
@@ -39,39 +39,53 @@ class AddressListQuery extends Query
 		}
 		ksort($arr);
 		
-		$html = '<table><th>Navn</th><th>E-post</th><th>Telefon</th><th>Adresse</th><th>Oppdatert</th>';
+		$html = '<table><th>Navn</th><th>E-post</th><th>Telefon</th><th>Kategori</th>';
 				
 		foreach ($arr as $person)
 		{
 			$firstname = $person->PersonName->Given;
 			$lastname = $person->PersonName->Family;
 			
-      $address = $person->Address;      
+			$address = $person->Address;      
 			$addressText = $address['street'];
-      
-      if(!empty($addressText))
-        $addressText .= ', '.$address['zipCode'].' '.$address['city'];
-			
-      $addressText = htmlentities($addressText);
 
-      $personName = "$lastname, $firstname";
-      $personName = htmlentities($personName);
-
-      $tele = $person->Tele;
-      
-      $email = $tele['mailAddress'];
-      
-      //$email = str_replace('@', '[at]', $email);
-      
-      $mobile = $tele['mobilePhoneNumber'];
-      $phone = $tele['phoneNumber'];
-      
-      $modified = $tele->ModifyDate->Date;
-      
-      if(!empty($mobile))
-        $phone = $mobile;
+			if(!empty($addressText))
+				$addressText .= ', '.$address['zipCode'].' '.$address['city'];
 			
-			$html .= "<tr><td>$personName</td><td>$email</td><td>$phone</td><td>$addressText</td><td>$modified</td></tr>";
+			$addressText = htmlentities($addressText);
+
+			$personName = "$lastname, $firstname";
+			$personName = utf8_decode($personName);
+			$personName = htmlentities($personName);
+			
+			$birthDate = $person->BirthDate->Date;
+			$age = date('Y') - substr($birthDate,0,4); 
+			
+			$class = 'Barn';
+			
+			if($age > 39)
+				$class = 'Veteran';
+			else if ($age > 20)
+				$class = 'Senior';
+			else if ($age > 16)
+				$class = 'Junior';
+			else if ($age > 12)
+				$class = 'Ungdom';
+
+			// Ikke skriv ut Barn
+			if(substr($class,0,1) == 'B')
+				continue;
+
+			$tele = $person->Tele;
+
+			$email = $tele['mailAddress'];
+			$mobile = $tele['mobilePhoneNumber'];
+			$phone = $tele['phoneNumber'];
+
+			if(!empty($mobile))
+				$phone = $mobile;
+
+			$html .= "<tr><td>$personName</td><td>$email</td><td>$phone</td><td>$class</td></tr>";
 		}
 		$html .= '</table>';		
 

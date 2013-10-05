@@ -43,6 +43,7 @@ class ActivityDeadlinesQuery extends Query
 			
 			if ($today >= $visibleFrom && $today <= $visibleTo) {
 				$name = $activity->Name;
+        $name = utf8_decode($name);        
 				$url = $activity['url'];
 				$numRegistrations = $activity['registrationCount'];
 				$registrationDeadline = $activity['registrationDeadline'];

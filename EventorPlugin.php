@@ -54,13 +54,15 @@ function eventor_query_shortcode($atts)
 	// 	overskriv attributter med verdier fra querystring
 	foreach($atts as $key => $value)	
 	{
-		$qs = $_GET[$key];
-		
-		if(!empty($qs))
-		{
-			$atts[$key] = $qs;
+    if(isset($_GET[$key]))
+    {
+      $qs = $_GET[$key];
+      
+      if(!empty($qs))
+      {
+        $atts[$key] = $qs;
+      }
 		}
-		
 		//echo $atts[$key];
 	}
 	

@@ -41,7 +41,7 @@ class EventsFromOptionListQuery extends Query
 			$eventorUrl = $this->getEventorBaseUrl() . '/Events/Show/'.$eventId;
 
 			$eventDate = $this->getNextDeadlineOrEventDate($event);
-
+      $name = utf8_decode($name);
 			$name = htmlentities($name);
 			$eventDate = new DateTime($eventDate);
 			$eventDate = $eventDate->format('j/n');
