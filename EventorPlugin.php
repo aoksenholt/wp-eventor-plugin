@@ -20,17 +20,6 @@ define('MT_EVENTOR_ACTIVITY_TTL', 'mt_eventor_activity_ttl');
 define('MT_EVENTOR_EVENTIDS', 'mt_eventor_eventids');
 define('MT_EVENTOR_CACHE_KEYS', 'mt_eventor_cache_keys');
 
-function loadQueries()
-{
-  @require_once dirname(__FILE__) ."/Queries/Query.php";
-  foreach (glob(dirname(__FILE__) ."/Queries/*Query.php") as $filename)
-  {        
-      @require_once $filename;
-  }
-}
-
-loadQueries();
-
 add_action('widgets_init', 'add_widget');
 
 // Hook for adding admin menus
@@ -49,7 +38,7 @@ function add_widget()
 function eventor_query_shortcode($atts)
 {	
 	$queryType = $atts['query'];	
-	$query = new $queryType();
+	$query = create($queryType);
 	
 	// 	overskriv attributter med verdier fra querystring
 	foreach($atts as $key => $value)	
@@ -78,46 +67,40 @@ function endsWith( $str, $sub )
 	return ( substr( $str, strlen( $str ) - strlen( $sub ) ) == $sub );
 }
 
+function requireBaseQuery()
+{
+    @require_once '/Queries/Query.php';
+}
 
+// Automatic include of Query classes
+function requireQuery($class_name)
+{    
+	$includeBase = '/Queries/';
 
+	if (!endsWith($class_name, 'Query'))
+	{
+		return null;
+	}    
 
-// // Automatic include of Query classes
-// function __autoload($class_name)
-// {
- // echo $class_name;
-	// $includeBase = 'Queries/';
-
-	// if (!endsWith($class_name, 'Query'))
-	// {
-		// return;
-	// }
-
-	// $words = preg_split('/(?=[A-Z])/', $class_name);
-
-	// if ($words[1] == 'Custom')
-	// {
-		// // Example: plugins/EventorPlugin-Nydalens/CustomNydalensQuery.php
-		// $includeBase = dirname(__FILE__). '-' . $words[2] . '/';
-	// }
-
-	// $filename = $includeBase.$class_name . '.php';
-	
-  // $file = $filename;
-  
-  // @require_once($file);
-	// include $filename;
-  // return;
-   // if (stristr(dirname(stream_resolve_include_path($file)), plugin_basename(__DIR__ ))) {
+	$words = preg_split('/(?=[A-Z])/', $class_name);
    
-        // if (file_exists(stream_resolve_include_path($file)) && is_file(stream_resolve_include_path($file))) {
-            
-            // @require_once($file);
+	if ($words[1] == 'Custom')
+	{
+		// Example: plugins/EventorPlugin-Nydalens/CustomNydalensQuery.php
+		$includeBase = dirname(__FILE__). '-' . $words[2] . '/';
+	}
+	
+	$filename = $includeBase.$class_name . '.php';	
+    	
+	requireBaseQuery();		    
+    @require_once $filename;	
+}
 
-        // }
-
-    // }
-// }
-
+function create($class_name)
+{
+    requireQuery($class_name);
+    return new $class_name();
+}
 // action function for above hook
 function eventor_add_pages()
 {
@@ -156,7 +139,7 @@ function eventor_options_page()
 
 	// See if the user has posted us some information
 	// If they did, this hidden field will be set to 'Y'
-	if( $_POST[ $hidden_field_name ] == 'Y' ) {
+	if( isset($_POST[ $hidden_field_name ]) && $_POST[ $hidden_field_name ] == 'Y' ) {
 		// Read their posted value
 		$opt_baseurl_val = $_POST[ MT_EVENTOR_BASEURL ];
 		$opt_apikey_val = $_POST[ MT_EVENTOR_APIKEY ];

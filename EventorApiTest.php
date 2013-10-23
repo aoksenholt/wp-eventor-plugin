@@ -7,6 +7,7 @@ This page is for playing with the Eventor API. See the <a href=https://eventor.o
 <?php
 
 require_once 'DebugFunctions.php';
+requireBaseQuery(); 
 
 // Dummy query for hooking up to the Query infrastructure
 class DebugQuery extends Query
@@ -29,8 +30,8 @@ class DebugQuery extends Query
 	}	
 	
 	public function loadWithCacheKey($cacheKey)
-	{
-		$this->xml = $this->loadFromEventor();											
+	{        
+		$this->setXml($this->loadFromEventor());
 	}
 }
 
@@ -60,7 +61,7 @@ function doEventorApiCall()
 
 	$query->load();
 	$xml = $query->getXml();	
-
+    
 	$xmlString = formatXmlString($xml);
 
 	echo 'Response<br /><textarea rows="30" cols="176">'.$xmlString.'</textarea>';

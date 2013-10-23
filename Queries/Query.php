@@ -99,7 +99,7 @@ abstract class Query
 
 	// Used to cache by widget instance: $queryInstance->loadWithCacheKey($args['widget_id']);
 	public function loadWithCacheKey($cacheKey)
-	{
+	{        
 		$this->initCache($cacheKey);
 
 		$this->html = $this->cacheLoad();
@@ -110,7 +110,7 @@ abstract class Query
 			$this->html = $this->formatHtml($this->xml);
 
 			$this->cachePut($this->html);
-		}
+		}       
 	}
 
 	protected function initCache($cacheKey)

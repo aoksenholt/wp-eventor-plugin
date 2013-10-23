@@ -24,7 +24,7 @@ function runQuery()
 		return;
 	}
 	
-	$query = new $queryType();
+	$query = create($queryType);
 	
 	$supportedParameters = $query->getSupportedParameters();
 	
@@ -36,6 +36,9 @@ function runQuery()
 	{
 		foreach ($supportedParameters as $parameter => $defaultValue)
 		{		
+            if(!isset($_POST[$parameter]))
+                continue;
+
 			$value = $_POST[$parameter];
 	
 			if(empty($value))

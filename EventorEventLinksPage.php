@@ -5,11 +5,12 @@ $hidden_field_name = 'mt_eventor_events_admin_submit_hidden';
 
 require_once 'DebugFunctions.php';
 
+requireBaseQuery();
+require_once '/Queries/EventsFromOptionListQuery.php';
+
 // Dummy query for hooking up to the Query infrastructure
 class EventsAdminQuery extends EventsFromOptionListQuery
 {
-	
-	
 	protected function formatHtml($xml)
 	{
 		
@@ -70,10 +71,11 @@ function printEventListWithDeleteLinks()
 	return $query->getHtml();
 }
 
-$deleteEventId = $_GET['deleteEvent'];
+if(isset($_GET['deleteEvent']))
+    $deleteEventId = $_GET['deleteEvent'];
 
 // Legg til ny eventids
-if($_POST[$hidden_field_name] == 'Y')
+if( isset($_POST[$hidden_field_name]) && $_POST[$hidden_field_name] == 'Y')
 {
 	$opt_eventids = get_option( MT_EVENTOR_EVENTIDS );
 	$posted_eventids = $_POST['newEvents'];	

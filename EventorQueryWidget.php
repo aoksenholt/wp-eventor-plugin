@@ -1,4 +1,7 @@
 <?php
+
+requireBaseQuery();   
+
 class EventorQueryWidget extends WP_Widget {
 	const QUERIES_DIR = '/Queries/';
 	const SUPERCLASS = 'Query';
@@ -10,17 +13,18 @@ class EventorQueryWidget extends WP_Widget {
 	}
 
 	function initAvailableQueries()
-	{
+	{	
 		$this->loadQueryClasses(dirname(__FILE__) . self::QUERIES_DIR);
-		
+		       
 		// Load all queries in parallel folders, starting with "EventorPlugin-"
-		$pluginQueryDirs = glob("" . dirname(__FILE__) . "-*");		
+		$pluginQueryDirs = glob(dirname(__FILE__) . '-*', GLOB_ONLYDIR);	
+       
 		foreach ($pluginQueryDirs as $pluginQueryDir)
 		{
 			$this->loadQueryClasses($pluginQueryDir . '/');
 		}
-						
-		$classes = get_declared_classes();
+								
+		$classes = get_declared_classes();      
 
 		$this->availableQueries = array();
 
@@ -36,19 +40,19 @@ class EventorQueryWidget extends WP_Widget {
 	}
 
 	function loadQueryClasses($searchDir)
-	{		
+	{		       
 		$availabledQueries = glob("" . $searchDir . "*Query.php");
-
+		
 		foreach ($availabledQueries as $availableQuery)
 		{
 			$tmp = substr($availableQuery, $this->last_index_of('/', $availableQuery));
 			$current_class = substr($tmp, 0, strpos($tmp, '.'));
-
+            
 			if (!class_exists($current_class))
-			{
-				include ($availableQuery);
+			{                
+				@include_once ($availableQuery);
 			}
-		}
+		}		
 	}
 
 	function last_index_of($sub_str,$instr)
@@ -66,8 +70,13 @@ class EventorQueryWidget extends WP_Widget {
 	{
 		$this->initAvailableQueries();
 		
-		$title = esc_attr($instance['title']);
-		$query =  esc_attr($instance['query']);
+		$title = '';
+        if(isset($instance['title']))
+            $title = esc_attr($instance['title']);
+
+		$query = '';
+        if(isset($instance['query']))
+            $query = esc_attr($instance['query']);
 		?>
 	<p>
 		<label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:'); ?>
@@ -99,19 +108,20 @@ class EventorQueryWidget extends WP_Widget {
 	</p>
 	<p>Save to see eventual parameters below.</p>
 		<?php
-		
+				
 		if (empty($query))
 		{
 			return;
 		}
-			
-		$queryInstance = new $query();
+		   
+		$queryInstance = create($query);
 		
 		$supportedParameters = $queryInstance->getSupportedParameters();
 		
 		foreach ($supportedParameters as $parameter => $defaultValue)
 		{
-			$value = $instance[$parameter];
+            if(isset($instance[$parameter]))
+			    $value = $instance[$parameter];
 					
 			if (empty($value))
 			{
@@ -124,22 +134,21 @@ class EventorQueryWidget extends WP_Widget {
 	
 	function update($new_instance, $old_instance)
 	{
-		echo 'TESTING';		
+		//echo 'TESTING';		
 		// processes widget options to be saved
 		return $new_instance;
 	}
 
 	// Emit widget html
 	function widget($args, $instance)
-	{
-        
+	{        
 		// TODO: Hide surrounding html based on widget new config setting 'hide_wordpress_widget_html'.
 		$args['title'] = $instance['title'];
 		echo $args['before_widget'] . $args['before_title'] . $args['title'] . $args['after_title'];
 
 		// Instantiate query object dynamically from widget config.
 		$queryType = $instance['query'];
-		$query = new $queryType();
+		$query = create($queryType);
 
 		$query->setParameterValues($instance);
 				
